@@ -1,10 +1,13 @@
 const mongoose = require("mongoose");
+const slug = require('mongoose-slug-updater');
+mongoose.plugin(slug);
 
 const clinicSchema = new mongoose.Schema({
     tenPhongKham: String,
     maPhongKham: String,
     status: String,
     position: Number,
+    viTri: String,
     bacSiPhuTrach: String,
     description: String,
     thumbnail: String,
