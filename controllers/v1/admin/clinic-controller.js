@@ -38,7 +38,13 @@ module.exports.index = async (req,res) =>{
     countClinics,
   )
   //End Pagination
+  const objectSearch = searchHelper(req.query)
+  if (objectSearch.regex) {
+    find.tenPhongKham = objectSearch.regex
+  }
+  //Search
 
+  //End Search
   const clinic = await Clinic.find(find)
   .sort(sort)
   .limit(objectPagination.limitItems)
