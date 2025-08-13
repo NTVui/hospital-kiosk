@@ -6,11 +6,18 @@ const paginationHelper = require("../../../helpers/pagination");
 // [GET] /admin/clinics
 module.exports.index = async (req,res) =>{
     
-    const clinic = await Clinic.find({
-      deleted: false
-    })
-    console.log(req.query.status)
-    res.json(clinic)
+  let find = {
+    deleted: false,
+  }
+
+  if (req.query.status) {
+    find.status = req.query.status
+  }
+  //Đoạn bộ lọc
+  const filterStatus = filterStatusHelper(req.query)
+
+  const clinic = await Clinic.find(find)
+  res.json(clinic)
   //   res.render('admin/pages/clinics/index', {
   //   pageTitle: 'Trang quản lí phòng khám',
     
