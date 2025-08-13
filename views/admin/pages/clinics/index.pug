@@ -1,0 +1,90 @@
+extends ../../layouts/default.pug
+
+block main
+    .page-header
+        h1.page-title= pageTitle
+        .card.mb-3  
+            .card-header Bộ lọc và tìm kiếm 
+                .card-body 
+                    .row 
+                        .col-6 
+                            p filter 
+                        .col-6 
+                            p search 
+
+        .card.mb-3  
+            .card-header Danh sách
+                .card-body 
+                    .row 
+                        .col-8 
+                            p changeMulti 
+                        .col-4
+                            p Thêm mới
+            
+        .card.mb-3  
+            .card-header Sắp xếp 
+                .card-body 
+                    .row 
+                        .col-4 
+                            p Sắp xếp
+            
+        table(class="table table-hover table-bordered" checkbox-multi)
+            thead
+                tr
+                    th
+                    input(type='checkbox', name='checkall')
+                    th STT
+                    th Hình ảnh
+                    th Tên phòng khám
+                    th Mã phòng khám
+                    th Vị trí
+                    th Trạng thái
+                    th Người tạo
+                    th Người cập nhật
+                    th Hành động
+                             
+            tbody 
+                tr 
+                    td 
+                        input(type="checkbox", name="id")
+                    td 
+                        p Pagination 
+                    td 
+                        img(src="", alt="", width = '100px')
+                    td 
+                        p Tên phòng khám 
+                    td 
+                        p Mã pk 
+                    td 
+                        input(
+                            type="number",
+                            style="width: 60px",
+                            min = "1",
+                            name="position",
+                            )
+                    td 
+                        a(
+                            href="javascript:;"
+                            class="badge-status badge-status--active"
+                            button-change-status,
+                            data-status="Hoạt động"
+                        ) Hoạt động 
+
+                        a(
+                            href="javascript:;"
+                            class="badge-status badge-status--inactive"
+                            button-change-status,
+                            data-status="Tạm ngưng")
+                    td 
+                        p Người tạo 
+                    td 
+                        p Người cập nhật 
+                    td 
+                        a.btn.btn-secondary.btn-sm(href=`${pathAdmin}/clinics/detail/`) Chi tiết
+                        a.btn.btn-warning.btn-sm(href=`${pathAdmin}/clinics/edit/`) Sửa
+                        button(
+                        class="btn btn-danger btn-sm"
+                        button-delete
+                        ) Xóa
+
+
