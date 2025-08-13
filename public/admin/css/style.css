@@ -1,0 +1,160 @@
+/* default*/
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background-color: #f8f9fa;
+  color: #343a40;
+}
+
+.page-wrapper {
+  display: flex;
+  min-height: 100vh;
+}
+
+.main-container {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  transition: margin-left 0.3s ease;
+  padding: 30px
+}
+/* THAY THẾ BẰNG KHỐI NÀY */
+main { /* Dùng tag selector, không phải class .main */
+  flex-grow: 1; /* Cho phép nó lấp đầy không gian dọc còn lại */
+  padding: 25px;
+  overflow-y: auto; /* Thêm thanh cuộn nếu nội dung bị quá dài */
+  width: 100%;
+  max-width: 1200px; /* Chiều rộng tối đa bạn muốn, có thể thay đổi số này */
+  margin: 0 auto;    /* Tự động căn giữa theo chiều ngang */
+}
+
+.page-header {
+  padding-bottom: 1.5rem; /* Tạo khoảng trống bên dưới */
+  margin-bottom: 2rem;    /* Khoảng cách với nội dung bên dưới */
+  border-bottom: 1px solid #dee2e6; /* Đường kẻ phân cách */
+}
+
+/* Tiêu đề chính của trang */
+.page-title {
+  font-size: 2rem;    /* Làm chữ to và rõ hơn */
+  font-weight: 700;   /* In đậm, mạnh mẽ */
+  color: #212529;      /* Màu đen nhưng không quá gắt */
+  margin-top: 0;
+  margin-bottom: 0.5rem; /* Khoảng cách nhỏ với dòng mô tả */
+}
+
+/* Dòng mô tả bên dưới tiêu đề */
+.page-description {
+  font-size: 1rem;    /* Cỡ chữ bình thường */
+  color: #6c757d;      /* Màu xám để tạo sự tương phản, không cạnh tranh với tiêu đề */
+  margin-bottom: 0;   /* Bỏ khoảng cách thừa */
+  max-width: 600px;   /* Giới hạn độ dài để dễ đọc hơn */
+}
+
+/* Logic ẩn hiện sidebar */
+@media (min-width: 769px) {
+  body.sidebar-collapsed .main-container {
+    margin-left: 0;
+  }
+
+  body.sidebar-collapsed .sidebar {
+    transform: translateX(-100%);
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 1001;
+    transform: translateX(-100%);
+  }
+  
+  body.sidebar-open .sidebar {
+    transform: translateX(0);
+  }
+}
+
+/*sider*/
+.sidebar {
+  width: 250px;
+  background-color: #343a40;
+  color: #fff;
+  padding: 20px;
+  transition: transform 0.3s ease;
+  flex-shrink: 0;
+}
+
+.sidebar__title {
+  text-align: center;
+  margin-top: 0;
+  color: #fff;
+  font-size: 1.5rem;
+  border-bottom: 1px solid #495057;
+  padding-bottom: 15px;
+}
+
+.sidebar__nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 20px 0 0 0;
+}
+
+.sidebar__nav a {
+  display: block;
+  padding: 12px 15px;
+  color: #adb5bd;
+  text-decoration: none;
+  border-radius: 5px;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.sidebar__nav a:hover,
+.sidebar__nav li.active a {
+  background-color: #495057;
+  color: #fff;
+}
+
+/*header*/
+.site-header {
+  height: 60px;
+  background-color: #fff;
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  border-bottom: 1px solid #dee2e6;
+  flex-shrink: 0;
+}
+
+.menu-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.menu-toggle .bar {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background-color: #343a40;
+  margin: 5px 0;
+}
+
+.header-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.header-actions .button {
+  background-color: #007bff;
+  color: white;
+  padding: 8px 15px;
+  border-radius: 5px;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
