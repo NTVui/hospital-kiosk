@@ -1,0 +1,42 @@
+extends ../../layouts/default.pug
+
+block main
+
+  h1.page-title= service.tenDichVu
+
+  .card
+    .card-body
+      .row
+        //- CỘT BÊN TRÁI: HIỂN THỊ HÌNH ẢNH
+        .col-md-4
+          if service.thumbnail
+            img(src=service.thumbnail, alt=service.tenDichVu, class="img-fluid rounded")
+          else
+            
+            img(src="/upload/dich-vu-default", alt="Ảnh mặc định", class="img-fluid rounded")
+
+        //- CỘT BÊN PHẢI: HIỂN THỊ THÔNG TIN CHI TIẾT
+        .col-md-8
+          //- Nút chỉnh sửa
+          div.mb-4.text-right
+            a(href=`${pathAdmin}/services/edit/${service.id}` class="btn btn-warning") Chỉnh sửa thông tin
+          
+          //- Bảng thông tin chi tiết
+          table.table.table-bordered
+            tbody
+              tr
+                th Giá
+                td= service.price
+              tr
+                th Trạng thái
+                td
+                  if (service.status === "Hoạt động")
+                    span.badge-status.badge-status--active= service.status
+                  else
+                    span.badge-status.badge-status--inactive= service.status
+              tr
+                th Thuộc khoa
+                p Khoa
+              tr
+                th Mô tả
+                td= service.description

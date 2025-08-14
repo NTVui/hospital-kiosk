@@ -1,6 +1,7 @@
 const systemConfig = require("../../../../config/system");
 const dashboardRoutes = require("./dashboard-route")
 const clinicRoutes = require("./clinic-route")
+const serviceRoutes = require("./service-route")
 const pathMiddleware = require("../../../../middleware/admin/path-middleware");
 
 module.exports = (app) => {
@@ -10,4 +11,5 @@ module.exports = (app) => {
   app.use(PATH_ADMIN, pathMiddleware.path);
   app.use(PATH_ADMIN + "/dashboard", dashboardRoutes);
   app.use(PATH_ADMIN + "/clinics", clinicRoutes);
+  app.use(PATH_ADMIN + "/services", serviceRoutes);
 };

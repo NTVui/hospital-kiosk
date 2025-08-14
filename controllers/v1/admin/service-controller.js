@@ -1,11 +1,11 @@
-const Clinic = require("../../../model/clinic-model");
+const Service = require("../../../model/service-model");
 const filterStatusHelper = require("../../../helpers/filterStatus");
 const searchHelper = require("../../../helpers/search");
 const paginationHelper = require("../../../helpers/pagination");
 const systemConfig = require('../../../config/system')
 
 
-// [GET] /admin/clinics
+// [GET] /admin/services
 module.exports.index = async (req,res) =>{
     
   let find = {
@@ -30,14 +30,14 @@ module.exports.index = async (req,res) =>{
   //End Sort
 
   //Pagination
-  const countClinics = await Clinic.countDocuments(find)
+  const countServices = await Service.countDocuments(find)
   let objectPagination = paginationHelper(
     {
       currentPage: 1,
       limitItems: 2,
     },
     req.query,
-    countClinics,
+    countServices,
   )
   //End Pagination
   
@@ -48,14 +48,14 @@ module.exports.index = async (req,res) =>{
   }
   //End Search
 
-  const clinics = await Clinic.find(find)
+  const services = await Service.find(find)
   .sort(sort)
   .limit(objectPagination.limitItems)
   .skip(objectPagination.skip)
   
-    res.render('admin/pages/clinics/index', {
-    pageTitle: 'Trang quản lí phòng khám',
-    clinics: clinics,
+    res.render('admin/pages/services/index', {
+    pageTitle: 'Trang quản lí dịch vụ',
+    services: services,
     filterStatus: filterStatus,
     keyword: objectSearch.keyword,
     pagination: objectPagination,
@@ -63,31 +63,31 @@ module.exports.index = async (req,res) =>{
   })
 }
 
-// [GET] /admin/clinics/detail/:id
+// [GET] /admin/services/detail/:id
 module.exports.detail = async (req, res) => {
   try {
     const find = {
       deleted: false,
       _id: req.params.id,
     };
-    const clinic = await Clinic.findOne(find);
+    const service = await Service.findOne(find);
 
-    res.render('admin/pages/clinics/detail', {
-      pageTitle: clinic.tenPhongKham, // [SỬA] Lấy tên phòng khám làm tiêu đề
-      clinic: clinic
+    res.render('admin/pages/services/detail', {
+      pageTitle: service.tenDichVu, 
+      service: service
     });
   } catch (error) {
-    req.flash("error", "Không tìm thấy phòng khám!");
-    res.redirect(`${systemConfig.prefixAdmin}/clinics`);
+    req.flash("error", "Không tìm thấy dịch vụ!");
+    res.redirect(`${systemConfig.prefixAdmin}/services`);
   }
 }
 
-// [PATCH] /admin/clinics/change-status/:status/:id
+// [PATCH] /admin/services/change-status/:status/:id
 module.exports.changeStatus = async (req, res) => {
   try {
     const id = req.params.id;
     const status = req.params.status;
-    await Clinic.updateOne({ _id: id }, {
+    await Service.updateOne({ _id: id }, {
     status: status,
    
     })
@@ -97,12 +97,12 @@ module.exports.changeStatus = async (req, res) => {
     } catch (error) {
       console.log("LỖI KHI CẬP NHẬT TRẠNG THÁI:", error);
       req.flash('error', 'Lỗi! Cập nhật trạng thái thất bại.');
-      res.redirect(`${systemConfig.prefixAdmin}/clinics`);
+      res.redirect(`${systemConfig.prefixAdmin}/services`);
     }
     
 }
 
-// [PATCH] /admin/clinics/change-multi/
+// [PATCH] /admin/services/change-multi/
 module.exports.changeMulti = async (req, res) => {
   
   const type = req.body.type;
@@ -116,19 +116,19 @@ module.exports.changeMulti = async (req, res) => {
 
   switch (type) {
     case 'active':
-      await Clinic.updateMany({ _id: { $in: ids } }, {
+      await Service.updateMany({ _id: { $in: ids } }, {
         status: 'active' });
       req.flash('success', `Đã cập nhật ${ids.length} thành hoạt động!`)
       break; 
 
     case 'inactive':
-      await Clinic.updateMany({ _id: { $in: ids } }, {
+      await Service.updateMany({ _id: { $in: ids } }, {
         status: 'inactive' });
       req.flash('success', `Đã cập nhật ${ids.length} thành ngưng hoạt động!`)
       break;
     
     case 'delete-all':
-      await Clinic.deleteMany(
+      await Service.deleteMany(
         { _id: {$in: ids}},
         {deleted: true}
       )

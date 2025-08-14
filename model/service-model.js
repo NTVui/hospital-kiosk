@@ -2,14 +2,15 @@ const mongoose = require("mongoose");
 const slug = require('mongoose-slug-updater');
 mongoose.plugin(slug);
 
-const clinicSchema = new mongoose.Schema({
-    tenPhongKham: String,
-    maPhongKham: String,
-    
+const serviceSchema = new mongoose.Schema({
+    tenDichVu: String,
+    clinic_id: {
+        type: String,
+        default: ""
+    },
+    price: Number,
     status: String,
     position: Number,
-    viTri: String,
-    bacSiPhuTrach: String,
     description: String,
     thumbnail: String,
     createdBy:{
@@ -17,7 +18,7 @@ const clinicSchema = new mongoose.Schema({
     },
     slug: { 
         type: String, 
-        slug: "tenPhongKham",
+        slug: "tenDichVu",
         unique: true
     },
     deleted: {
@@ -35,6 +36,6 @@ const clinicSchema = new mongoose.Schema({
 }, {
     timestamps: true
 });
-const Clinic = mongoose.model("Clinic",clinicSchema, "clinics");
+const Service = mongoose.model("Service",serviceSchema, "services");
 
-module.exports = Clinic;
+module.exports = Service;
