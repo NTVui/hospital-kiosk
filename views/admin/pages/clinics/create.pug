@@ -1,0 +1,75 @@
+extends ../../layouts/default.pug
+include ../../mixins/alert.pug
+
+block main
+  +alert-success(5000)
+  +alert-error(5000)
+
+  h1.page-title= pageTitle
+
+ 
+  .card
+    .card-body
+      form(
+        action=`${pathAdmin}/clinics/create`
+        method="POST"
+        enctype="multipart/form-data" 
+      )
+        .row
+          .col-md-6
+            //- Sửa name="title" thành "tenPhongKham"
+            .form-group
+              label(for="tenPhongKham") Tên phòng khám *
+              input#tenPhongKham.form-control(type="text", name="tenPhongKham", required)
+            
+            //- Thêm trường Mã phòng khám
+            .form-group
+              label(for="maPhongKham") Mã phòng khám *
+              input#maPhongKham.form-control(type="text", name="maPhongKham", required)
+
+            //- Thêm trường Bác sĩ
+            .form-group
+              label(for="bacSiPhuTrach") Bác sĩ phụ trách
+              input#bacSiPhuTrach.form-control(type="text", name="bacSiPhuTrach")
+
+            //- Thêm trường Vị trí thực tế
+            .form-group
+              label(for="viTri") Vị trí thực tế
+              input#viTri.form-control(type="text", name="viTri")
+
+          .col-md-6
+            //- Upload ảnh
+            .form-group(upload-image)
+              label(for="thumbnail") Hình ảnh
+              input#thumbnail.form-control-file(type='file', name='thumbnail', accept="image/*", upload-image-input)
+              img(src="", upload-image-preview, class="image-preview")
+              span(class="btn btn-danger btn-sm d-inline-block mt-2" upload-image-remove) Xóa ảnh
+            
+            //- Thứ tự
+            .form-group
+              label(for='position') Thứ tự
+              input#position.form-control(type='number', name='position', placeholder='Tự động sắp xếp nếu để trống', min='1')
+
+        //- Mô tả
+        .form-group
+          label(for='description') Mô tả
+          textarea#description.form-control(rows='5', name='description')
+        
+        //- Trạng thái
+        .form-group
+          label Trạng thái
+          .d-flex.align-items-center.gap-3
+            .form-check.form-check-inline
+              //- Sửa value="active" thành "Hoạt động"
+              input#status-active.form-check-input(type='radio', name='status', value='Hoạt động', checked)
+              label.form-check-label(for='status-active') Hoạt động
+            .form-check.form-check-inline
+              //- Sửa value="inactive" thành "Tạm ngưng"
+              input#status-inactive.form-check-input(type='radio', name='status', value='Tạm ngưng')
+              label.form-check-label(for='status-inactive') Tạm ngưng
+
+        //- Nút hành động
+        .form-group
+          button.btn.btn-primary(type='submit') Tạo mới
+          a(href=`${pathAdmin}/clinics` class="btn btn-secondary ml-2") Hủy
+  script(src='/admin/js/scripts.js')

@@ -30,10 +30,10 @@ block main
               tr
                 th Trạng thái
                 td
-                  if (clinic.status === "Hoạt động")
-                    span.badge-status.badge-status--active= clinic.status
+                  if (clinic.status === "active")
+                    span.badge-status.badge-status--active Hoạt động
                   else
-                    span.badge-status.badge-status--inactive= clinic.status
+                    span.badge-status.badge-status--inactive Tạm ngưng
               tr
                 th Thứ tự hiển thị
                 td= clinic.position

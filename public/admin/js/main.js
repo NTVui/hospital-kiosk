@@ -168,12 +168,10 @@ if (showAlert) {
 //Upload Image
 const uploadImage = document.querySelector("[upload-image]");
 if (uploadImage) {
-  //Có thể tạo button x để bỏ khi chọn img đấy
-  //bắt sự kiện cho nó ("click")
-  //document.querySelector("[upload-image-input]").value=""
-  //document.querySelector("[upload-image-preview]").src=""
+  
   const uploadImageInput = document.querySelector("[upload-image-input]");
   const uploadImagePreview = document.querySelector("[upload-image-preview]");
+  const clearThumbnailInput = uploadImage.querySelector("input[name='clearThumbnail']");
 
   uploadImageInput.addEventListener("change", (e) => {
     //e luôn trả ra object, trong object luôn có key là target
@@ -181,8 +179,20 @@ if (uploadImage) {
     const file = e.target.files[0];
     if (file) {
       uploadImagePreview.src = URL.createObjectURL(file);
+      if(clearThumbnailInput) {
+      clearThumbnailInput.value = "false";
+    }
     }
   });
+  const uploadImageRemove = document.querySelector("[upload-image-remove]")
+  //console.log(uploadImageRemove)
+  uploadImageRemove.addEventListener("click", ()=>{
+    uploadImageInput.value = ""
+    uploadImagePreview.src=""
+    if(clearThumbnailInput) {
+      clearThumbnailInput.value = "true";
+    }
+  })
 }
 
 //Sort

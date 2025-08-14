@@ -1,0 +1,89 @@
+extends ../../layouts/default.pug
+include ../../mixins/alert.pug
+
+block main
+  +alert-success(5000)
+  +alert-error(5000)
+
+  h1.page-title= pageTitle
+
+ 
+  .card
+    .card-body
+      form(
+        action=`${pathAdmin}/services/edit/${service.id}?_method=PATCH`
+        method="POST"
+        enctype="multipart/form-data" 
+      )
+        .row
+          .col-md-6
+            
+            .form-group
+              label(for="tenDichVu") Tên phòng khám *
+              input#tenDichVu.form-control(type="text", name="tenDichVu", value=service.tenDichVu, required)
+            
+            .form-group
+                label(for="clinic_id") Thuộc phòng khám *
+                select#clinic_id.form-control(name="clinic_id", required)
+                    option(value="", disabled) -- Vui lòng chọn phòng khám --
+                    if clinics && clinics.length > 0
+                    each clinic in clinics
+                        //- Logic để chọn đúng phòng khám cũ của dịch vụ
+                        option(
+                        value=clinic.id,
+                        selected=(service.clinic_id.toString() == clinic.id.toString())
+                        ) #{clinic.tenPhongKham}
+                
+            .form-group
+                label(for="price") Giá tiền
+                //- Điền giá tiền cũ
+                input#price.form-control(type="number", name="price", min="0", value=service.price)
+            
+            .form-group
+                label(for="description") Mô tả
+                //- Điền mô tả cũ vào textarea
+                textarea#description.form-control(name="description", rows="4")= service.description
+
+          .col-md-6
+            //- Upload ảnh
+            .form-group(upload-image)
+              label(for="thumbnail") Hình ảnh
+              input#thumbnail.form-control-file(type='file', name='thumbnail', accept="image/*", upload-image-input)
+              img(src=service.thumbnail, upload-image-preview, class="image-preview")
+              span(class="btn btn-danger btn-sm d-inline-block mt-2" upload-image-remove) Xóa ảnh
+              input(type="hidden", name="clearThumbnail", value="false")
+            //- Thứ tự
+            .form-group
+              label(for='position') Thứ tự
+              input#position.form-control(type='number', name='position', placeholder='Tự động sắp xếp nếu để trống', min='1')
+
+    
+        
+            //- Trạng thái
+            .form-group
+            label Trạng thái
+                .d-flex.align-items-center.gap-3
+                    .form-check.form-check-inline
+                    
+                        input#status-inactive.form-check-input(
+                                type='radio',
+                                name='status',
+                                value='inactive',
+                                checked=(service.status=="active"?true:false)
+                            )
+                        label.form-check-label(for='status-inactive') Tạm ngưng
+                    .form-check.form-check-inline
+                        input#status-inactive.form-check-input(
+                                type='radio',
+                                name='status',
+                                value='inactive',
+                                checked=(service.status=="inactive"?true:false)
+                            )
+                        label.form-check-label(for='status-inactive') Tạm ngưng
+
+            //- Nút hành động
+            .form-group
+            button.btn.btn-primary(type='submit') Tạo mới
+            a(href=`${pathAdmin}/clinics` class="btn btn-secondary ml-2") Hủy
+  script(src='/admin/js/scripts.js')
+

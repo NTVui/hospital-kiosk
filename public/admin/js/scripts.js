@@ -1,4 +1,5 @@
 const buttonChangeStatus = document.querySelectorAll("[button-change-status]");
+//console.log(buttonChangeStatus)
 if (buttonChangeStatus.length > 0) {
   const formChangeStatus = document.querySelector("#form-change-status");
   const path = formChangeStatus.getAttribute("data-path");
@@ -19,6 +20,7 @@ if (buttonChangeStatus.length > 0) {
 
 //Delete Item
 const buttonDelete = document.querySelectorAll("[button-delete]");
+//console.log(buttonDelete)
 if (buttonDelete.length > 0) {
   const formDeleteItem = document.querySelector("#form-delete-item");
   const path = formDeleteItem.getAttribute("data-path");

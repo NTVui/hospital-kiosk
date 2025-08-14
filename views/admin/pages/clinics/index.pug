@@ -7,6 +7,8 @@ include ../../mixins/alert.pug
 include ../../mixins/sort.pug
 
 block main
+    +alert-success(5000)
+    +alert-error(5000)
     .page-header
         h1.page-title= pageTitle
         .card.mb-3  
@@ -87,17 +89,17 @@ block main
                                 data-id=item.id
                             ) Xóa
         +pagination(pagination)
-            // Form ẩn để thay đổi trạng thái
-            form#form-change-status(
-                action='',
-                method='POST',
-                data-path=`${pathAdmin}/clinics/change-status`
-            )
+        // Form ẩn để thay đổi trạng thái
+        form#form-change-status(
+            action='',
+            method='POST',
+            data-path=`${pathAdmin}/clinics/change-status`
+        )
 
 
-            form#form-delete-item(
-                action='',
-                method='POST',
-                data-path=`${pathAdmin}/clinics/delete`
-            )
+        form#form-delete-item(
+            action='',
+            method='POST',
+            data-path=`${pathAdmin}/clinics/delete`
+        )
     script(src='/admin/js/scripts.js') 

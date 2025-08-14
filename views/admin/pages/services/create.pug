@@ -1,0 +1,54 @@
+extends ../../layouts/default.pug
+include ../../mixins/alert.pug
+block main
+  +alert-success(5000)
+  +alert-error(5000)
+  h1.page-title= pageTitle
+
+  .card
+    .card-body
+      form(
+        action=`${pathAdmin}/services/create`
+        method="POST"
+      )
+        .form-group
+          label(for="tenDichVu") Tên dịch vụ *
+          input#tenDichVu.form-control(type="text", name="tenDichVu", required)
+
+        //- DROPDOWN CHỌN PHÒNG KHÁM
+        .form-group
+          label(for="clinic_id") Thuộc phòng khám *
+          select#clinic_id.form-control(name="clinic_id", required)
+            option(value="", disabled, selected) -- Vui lòng chọn phòng khám --
+            
+            //- Dùng vòng lặp để hiển thị các phòng khám
+            if clinics && clinics.length > 0
+              each clinic in clinics
+                option(value=clinic.id) #{clinic.tenPhongKham}
+        
+        .form-group
+          label(for="price") Giá tiền
+          input#price.form-control(type="number", name="price", min="0")
+        
+        .form-group
+          label(for="description") Mô tả
+          textarea#description.form-control(name="description", rows="4")
+
+        .form-group(upload-image)
+              label(for="thumbnail") Hình ảnh
+              input#thumbnail.form-control-file(type='file', name='thumbnail', accept="image/*", upload-image-input)
+              img(src="", upload-image-preview, class="image-preview")
+              span(class="btn btn-danger btn-sm d-inline-block mt-2" upload-image-remove) Xóa ảnh
+
+        .form-group
+          label Trạng thái
+          .form-check.form-check-inline
+            input#status-active.form-check-input(type='radio', name='status', value='Hoạt động', checked)
+            label.form-check-label(for='status-active') Hoạt động
+          .form-check.form-check-inline
+            input#status-inactive.form-check-input(type='radio', name='status', value='Tạm ngưng')
+            label.form-check-label(for='status-inactive') Tạm ngưng
+
+        .form-group
+          button(type="submit", class="btn btn-primary") Tạo mới
+          a(href=`${pathAdmin}/services`, class="btn btn-secondary ml-2") Hủy

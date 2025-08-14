@@ -6,7 +6,8 @@ const serviceSchema = new mongoose.Schema({
     tenDichVu: String,
     clinic_id: {
         type: String,
-        default: ""
+        default: "",
+        ref: 'Clinic'
     },
     price: Number,
     status: String,

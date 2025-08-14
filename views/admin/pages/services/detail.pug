@@ -1,7 +1,6 @@
 extends ../../layouts/default.pug
 
 block main
-
   h1.page-title= service.tenDichVu
 
   .card
@@ -13,7 +12,7 @@ block main
             img(src=service.thumbnail, alt=service.tenDichVu, class="img-fluid rounded")
           else
             
-            img(src="/upload/dich-vu-default", alt="Ảnh mặc định", class="img-fluid rounded")
+            img(src="/upload/dich-vu-default.jpeg", alt="Ảnh mặc định", class="img-fluid rounded")
 
         //- CỘT BÊN PHẢI: HIỂN THỊ THÔNG TIN CHI TIẾT
         .col-md-8
@@ -30,13 +29,13 @@ block main
               tr
                 th Trạng thái
                 td
-                  if (service.status === "Hoạt động")
-                    span.badge-status.badge-status--active= service.status
+                  if (service.status === "active")
+                    span.badge-status.badge-status--active Hoạt động
                   else
-                    span.badge-status.badge-status--inactive= service.status
+                    span.badge-status.badge-status--inactive Tạm ngưng
               tr
                 th Thuộc khoa
-                p Khoa
+                td= service.clinic_id.tenPhongKham
               tr
                 th Mô tả
                 td= service.description

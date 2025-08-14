@@ -1,0 +1,31 @@
+extends ../../layouts/default.pug
+include ../../mixins/alert.pug
+
+block main
+  +alert-success(5000)
+  +alert-error(5000)
+  
+  h1.page-title= pageTitle
+
+  .card
+    .card-body
+      table.table.table-hover.table-bordered
+        thead
+          tr
+            th STT
+            th Số CCCD
+            th Mã số BHYT
+            th Ngày tạo
+            
+        tbody
+          if bhyt.length > 0
+            //- Dùng vòng lặp để duyệt qua mảng bhyt từ controller
+            each record, index in bhyt
+              tr
+                td #{index + 1}
+                td #{record.cccd}
+                td #{record.soBHYT}
+                //-td #{moment(record.createdAt).format("DD/MM/YYYY")}
+          else
+            tr
+              td(colspan="4", class="text-center") Chưa có dữ liệu.

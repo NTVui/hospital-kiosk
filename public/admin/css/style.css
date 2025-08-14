@@ -282,3 +282,65 @@ main { /* Dùng tag selector, không phải class .main */
 #form-search .btn-success i {
   font-size: 0.9rem; /* Chỉnh lại kích thước icon một chút */
 }
+
+/* Vùng thông báo hiển thị (mặc định là hiện) */
+[show-alert] {
+  position: fixed;
+  top: 70px;
+  right: 15px;
+  z-index: 9999;
+  transition: all 0.3s ease;
+}
+
+/* Khi muốn ẩn thông báo: thêm class .alert-hidden */
+[show-alert].alert-hidden {
+  animation-name: alert-hidden;
+  animation-duration: 0.5s;
+  animation-fill-mode: both;
+}
+
+/* Keyframe ẩn thông báo (slide ra ngoài và biến mất) */
+@keyframes alert-hidden {
+  from {
+    right: 15px;
+    opacity: 1;
+  }
+  to {
+    right: -100%;
+    opacity: 0;
+    display: none;
+  }
+}
+
+/* Nút đóng nằm trong alert */
+[show-alert] [close-alert] {
+  background: #ffffffc4;       /* 💡 nền trắng trong suốt một chút */
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  line-height: 24px;           /* 📐 canh chữ theo chiều cao */
+  text-align: center;
+  font-weight: 600;
+  border-radius: 50%;          /* 🎯 tạo hình tròn */
+  cursor: pointer;             /* 🖱️ hiện hình tay khi hover */
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  font-size: 14px;
+  transition: background 0.3s;
+}
+
+/* Hover có hiệu ứng mượt hơn */
+.show-alert [close-alert]:hover {
+  background: #ffcccc;
+}
+
+/* Image Preview */
+.image-preview {
+  width: 150px;               /* 📏 Kích thước ảnh */
+  height: auto;               /* 🔄 Tự điều chỉnh chiều cao theo tỉ lệ */
+  margin-top: 15px;           /* 📐 Cách phần tử phía trên */
+  border: 1px solid #ddd;     /* 🖼️ Viền xám nhạt */
+  padding: 15px;              /* 📦 Khoảng cách bên trong */
+  border-radius: 5px;         /* 🔘 Bo góc nhẹ */
+}
