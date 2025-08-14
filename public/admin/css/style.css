@@ -159,6 +159,7 @@ main { /* Dùng tag selector, không phải class .main */
   font-size: 0.9rem;
 }
 
+
 /*Đổi trạng thái*/
 /* Style cho nút trạng thái */
 .badge-status {
@@ -189,4 +190,95 @@ main { /* Dùng tag selector, không phải class .main */
 .badge-status--inactive {
   color: #fff;
   background-color: #6c757d; /* Màu xám */
+}
+
+/*Trang Detail*/
+.table-bordered th {
+  background-color: #f8f9fa; /* Màu nền cho ô tiêu đề */
+  font-weight: 600;
+  width: 200px; /* Cố định chiều rộng cột tiêu đề */
+}
+
+.table-bordered td,
+.table-bordered th {
+  vertical-align: middle; /* Căn giữa nội dung theo chiều dọc */
+}
+
+/* Nút quay lại và chỉnh sửa */
+.btn-secondary {
+  background-color: #6c757d;
+  border-color: #6c757d;
+  color: #fff;
+}
+
+.btn-warning {
+  background-color: #ffc107;
+  border-color: #ffc107;
+  color: #212529;
+}
+
+
+/*Pagination*/
+.pagination {
+  display: flex;
+  list-style: none;
+  justify-content: center;
+  margin-top: 2rem;
+  gap: 4px;
+}
+
+.page-link {
+  padding: 0.5rem 1rem;
+  color: #3b82f6;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  transition: background 0.2s, color 0.2s;
+}
+
+.page-item.active .page-link {
+  background: #3b82f6;
+  color: white;
+  border-color: #3b82f6;
+}
+
+.page-link:hover {
+  background: #eff6ff;
+}
+
+
+/*Thanh search*/
+#form-search {
+  max-width: 500px; /* Giới hạn chiều rộng của ô tìm kiếm */
+  margin-bottom: 1.5rem; /* Khoảng cách với các phần tử bên dưới */
+}
+
+/* Tùy chỉnh ô input */
+#form-search .form-control {
+  border-radius: 2rem 0 0 2rem; /* Bo tròn mạnh cạnh trái */
+  border-right: none; /* Bỏ đường viền giữa ô input và nút */
+  padding-left: 1.5rem;
+  transition: all 0.3s ease-in-out;
+  height: calc(1.5em + .75rem + 2px); /* Đồng bộ chiều cao */
+}
+
+/* Hiệu ứng khi focus vào ô input */
+#form-search .form-control:focus {
+  border-color: #3dae79; /* Đổi màu viền thành màu xanh của nút */
+  box-shadow: 0 0 0 0.25rem rgba(40, 167, 69, 0.25); /* Thêm bóng mờ */
+  z-index: 3;
+}
+
+/* Tùy chỉnh nút tìm kiếm */
+#form-search .btn-success {
+  border-radius: 0 2rem 2rem 0; /* Bo tròn mạnh cạnh phải */
+  display: flex;
+  align-items: center;
+  gap: 0.5rem; /* Khoảng cách giữa icon và chữ "Tìm" */
+  padding-left: 1.25rem;
+  padding-right: 1.25rem;
+}
+
+#form-search .btn-success i {
+  font-size: 0.9rem; /* Chỉnh lại kích thước icon một chút */
 }

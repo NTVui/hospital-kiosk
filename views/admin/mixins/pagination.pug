@@ -1,0 +1,29 @@
+mixin pagination(pagination)
+  nav(aria-label="Trang phân trang")
+    ul.pagination
+      //- Nút Trang Đầu
+      if (pagination.currentPage > 1)
+        li.page-item
+          button.page-link(button-pagination=1, aria-label="Trang đầu")
+            span(aria-hidden="true") &laquo;
+
+      //- Nút Trang Trước
+      if (pagination.currentPage > 1)
+        li.page-item
+          button.page-link(button-pagination=pagination.currentPage - 1, aria-label="Trang trước") Trang trước
+
+      //- Các trang số
+      - for (var i = 1; i <= pagination.totalPage; i++)
+        li.page-item(class=(pagination.currentPage == i ? "active" : ""))
+          button.page-link(button-pagination=i) #{i}
+
+      //- Nút Kế Tiếp
+      if (pagination.currentPage < pagination.totalPage)
+        li.page-item
+          button.page-link(button-pagination=pagination.currentPage + 1, aria-label="Kế tiếp") Kế tiếp
+      
+      //- Nút Trang Cuối
+      if (pagination.currentPage < pagination.totalPage)
+        li.page-item
+          button.page-link(button-pagination=pagination.totalPage, aria-label="Trang cuối")
+            span(aria-hidden="true") &raquo;

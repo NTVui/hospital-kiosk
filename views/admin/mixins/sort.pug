@@ -1,0 +1,7 @@
+mixin sort()
+    div(sort)
+            select.form-control(name="sort", sort-select)
+                option(value="tenPhongKham-asc") Tên phòng khám A - Z
+                option(value="tenPhongKham-desc") Tên phòng khám Z - A
+
+            button.btn.btn-danger.mt-2(type="submit", sort-clear) Clear

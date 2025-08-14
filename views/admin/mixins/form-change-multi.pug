@@ -1,0 +1,17 @@
+mixin form-change-multi(path)
+    form(
+        action=path
+        method='POST'
+        form-change-multi
+        )
+        .d-flex.align-items-start
+            .form-group
+                select.form-control(name='type')
+                    option(disabled selected) -- Chọn --
+                    option(value='active') Hoạt động
+                    option(value='inactive') Tạm ngưng
+                    option(value='delete-all') Xóa tất cả
+            .form-group
+                input(type="hidden", name="redirect" value=currentUrl)
+                input.form-control(type='text', name='ids', value='', class="form-control d-none")
+            button.btn.btn-primary(type='submit') Áp dụng

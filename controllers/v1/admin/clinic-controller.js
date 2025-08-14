@@ -3,6 +3,8 @@ const filterStatusHelper = require("../../../helpers/filterStatus");
 const searchHelper = require("../../../helpers/search");
 const paginationHelper = require("../../../helpers/pagination");
 
+
+
 // [GET] /admin/clinics
 module.exports.index = async (req,res) =>{
     
@@ -32,28 +34,33 @@ module.exports.index = async (req,res) =>{
   let objectPagination = paginationHelper(
     {
       currentPage: 1,
-      limitItems: 4,
+      limitItems: 2,
     },
     req.query,
     countClinics,
   )
   //End Pagination
+  
+  //Search
   const objectSearch = searchHelper(req.query)
   if (objectSearch.regex) {
     find.tenPhongKham = objectSearch.regex
   }
-  //Search
-
   //End Search
-  const clinic = await Clinic.find(find)
+
+  const clinics = await Clinic.find(find)
   .sort(sort)
   .limit(objectPagination.limitItems)
   .skip(objectPagination.skip)
-  res.json(clinic)
-  //   res.render('admin/pages/clinics/index', {
-  //   pageTitle: 'Trang quản lí phòng khám',
-    
-  // })
+  
+    res.render('admin/pages/clinics/index', {
+    pageTitle: 'Trang quản lí phòng khám',
+    clinics: clinics,
+    filterStatus: filterStatus,
+    keyword: objectSearch.keyword,
+    pagination: objectPagination,
+    currentUrl: req.originalUrl 
+  })
 }
 
 // [GET] /admin/clinics/detail/:id
@@ -65,53 +72,41 @@ module.exports.detail = async (req, res) => {
     }
     const clinic = await Clinic.findOne(find)
     
-    res.json(clinic)
-    // res.render('admin/pages/products/detail', {
-    //   pageTitle: product.title,
-    //   product: product,
-    // })
+    
+    res.render('admin/pages/clinics/detail', {
+      pageTitle: product.title,
+      clinic: clinic
+    })
   } catch (error) {
-    //res.redirect(`${version}${systemConfig.prefixAdmin}/clinics`)
+    res.redirect(`${version}${systemConfig.prefixAdmin}/clinics`)
   }
 }
 
-// [GET] /admin/clinics/change-status/:id
+// [PATCH] /admin/clinics/change-status/:id
 module.exports.changeStatus = async (req, res) => {
   try {
     const id = req.params.id;
-    const status = req.body.status;
+    const status = req.params.status;
     await Clinic.updateOne({
       _id: id
     },{
       status: status
     })
-    
-    res.json({
-      code: 200,
-      message: "Cập nhật trạng thái thành công"
-    })
+    req.flash('success', 'Thành công!')
     } catch (error) {
-      res.json({
-      code: 400,
-      message: "Không tồn tại"
-    })
+      console.log("LỖI KHI CẬP NHẬT TRẠNG THÁI:", error);
+      req.flash('error', 'Lỗi! Cập nhật trạng thái thất bại.');
+      res.redirect('back');
     }
 
 }
 
 // [PATCH] /admin/clinics/change-multi/
-/*
-{
-  "type": "status",
-  "ids": "id_1,id_2,id_3",
-  "value": "Hoạt động"
-}
-*/
 module.exports.changeMulti = async (req, res) => {
   
   const type = req.body.type;
   const idsString = req.body.ids;
-  const value = req.body.value; 
+   
 
   const ids = idsString
     .split(',')
@@ -119,25 +114,29 @@ module.exports.changeMulti = async (req, res) => {
     .filter((id) => id.length > 0);
 
   switch (type) {
-    case 'status':
+    case 'active':
       await Clinic.updateMany({ _id: { $in: ids } }, {
-        status: value 
-      });
-      res.json({
-        code: 200,
-        message: "Cập nhật trạng thái thành công"
-      });
+        status: 'active' });
+      req.flash('success', `Đã cập nhật ${ids.length} thành hoạt động!`)
       break; 
 
-    case 'delete': // Ví dụ cho trường hợp khác
-      // ...
+    case 'inactive':
+      await Clinic.updateMany({ _id: { $in: ids } }, {
+        status: 'inactive' });
+      req.flash('success', `Đã cập nhật ${ids.length} thành ngưng hoạt động!`)
       break;
-      
+    
+    case 'delete-all':
+      await Clinic.deleteMany(
+        { _id: {$in: ids}},
+        {deleted: true}
+      )
+      req.flash('success', `Đã xóa hết!`)
+      break;
     default:
-      res.json({
-        code: 400,
-        message: "Hành động không hợp lệ"
-      });
+      req.flash('error', 'Hành động không hợp lệ!');
       break;
   }
+  const redirectUrl = req.body.redirect || `${pathAdmin}/clinics`;
+  res.redirect(redirectUrl);
 };

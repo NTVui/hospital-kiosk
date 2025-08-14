@@ -1,0 +1,48 @@
+extends ../../layouts/default.pug
+
+block main
+
+  h1.page-title= clinic.tenPhongKham
+
+  .card
+    .card-body
+      .row
+        //- CỘT BÊN TRÁI: HIỂN THỊ HÌNH ẢNH
+        .col-md-4
+          if clinic.thumbnail
+            img(src=clinic.thumbnail, alt=clinic.tenPhongKham, class="img-fluid rounded")
+          else
+            //- Ảnh mặc định nếu phòng khám không có thumbnail
+            img(src="/upload/phong_kham_default.jfif", alt="Ảnh mặc định", class="img-fluid rounded")
+
+        //- CỘT BÊN PHẢI: HIỂN THỊ THÔNG TIN CHI TIẾT
+        .col-md-8
+          //- Nút chỉnh sửa
+          div.mb-4.text-right
+            a(href=`${pathAdmin}/clinics/edit/${clinic.id}` class="btn btn-warning") Chỉnh sửa thông tin
+          
+          //- Bảng thông tin chi tiết
+          table.table.table-bordered
+            tbody
+              tr
+                th Mã phòng khám
+                td= clinic.maPhongKham
+              tr
+                th Trạng thái
+                td
+                  if (clinic.status === "Hoạt động")
+                    span.badge-status.badge-status--active= clinic.status
+                  else
+                    span.badge-status.badge-status--inactive= clinic.status
+              tr
+                th Thứ tự hiển thị
+                td= clinic.position
+              tr
+                th Bác sĩ phụ trách
+                td= clinic.bacSiPhuTrach
+              tr
+                th Vị trí
+                td= clinic.viTri
+              tr
+                th Mô tả
+                td= clinic.description
