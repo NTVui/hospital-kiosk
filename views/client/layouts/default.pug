@@ -1,0 +1,20 @@
+doctype html
+html(lang="vi")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    title KIOSK Đăng ký khám bệnh
+    //- Link Bootstrap và Font Awesome (cho icon)
+    link(rel="stylesheet", href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css")
+    link(rel="stylesheet", href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css")
+    link(rel="stylesheet", href="/css/style.css")
+  body
+    .kiosk-wrapper
+      header.kiosk-header
+        .logo
+          img(src="https://phuongnamvina.com/img_data/images/logo-benh-vien.jpg", alt="Logo Bệnh viện")
+          span BỆNH VIỆN 
+      
+      main.kiosk-main
+        //- Nội dung của từng trang sẽ được chèn vào đây
+        block main

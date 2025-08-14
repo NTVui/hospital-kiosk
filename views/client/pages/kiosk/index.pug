@@ -1,0 +1,23 @@
+extends ../../layouts/default.pug
+
+block main
+  .kiosk-menu
+    h1.menu-title HƯỚNG DẪN ĐĂNG KÝ KHÁM CHỮA BỆNH
+    p.menu-subtitle Vui lòng chọn chức năng
+
+    .button-container
+      //- Nút 1
+      a.menu-button.menu-button--green(href="#")
+        .menu-button__icon
+          i(class="fas fa-file-medical")
+        .menu-button__text
+          .main-text Đăng ký khám sức khỏe
+          .sub-text (Chạm để chọn chức năng)
+      
+      //- Nút 2 - Nút này sẽ bắt đầu quy trình 3 bước
+      a.menu-button.menu-button--blue(href="/API/v1/kiosk/step-1/check-cccd")
+        .menu-button__icon
+          i(class="fas fa-user-friends")
+        .menu-button__text
+          .main-text Đăng ký khám bệnh
+          .sub-text (Chạm để chọn chức năng)

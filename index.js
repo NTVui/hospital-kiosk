@@ -13,6 +13,7 @@ require("dotenv").config();
 const app = express();
 const port = process.env.PORT;
 
+const route = require("./API/v1/routes/client/index-route");
 const routeAdmin = require("./API/v1/routes/admin/index-route");
 
 
@@ -35,6 +36,7 @@ app.use(cookieParser('key tu Vui'))
 app.use(session({ cookie: { maxAge: 60000 } }))
 app.use(flash())
 
+route(app);
 routeAdmin(app);
 
 app.listen(port, () => {
