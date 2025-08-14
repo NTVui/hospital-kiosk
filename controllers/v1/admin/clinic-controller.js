@@ -2,7 +2,7 @@ const Clinic = require("../../../model/clinic-model");
 const filterStatusHelper = require("../../../helpers/filterStatus");
 const searchHelper = require("../../../helpers/search");
 const paginationHelper = require("../../../helpers/pagination");
-
+const systemConfig = require('../../../config/system')
 
 
 // [GET] /admin/clinics
@@ -69,36 +69,37 @@ module.exports.detail = async (req, res) => {
     const find = {
       deleted: false,
       _id: req.params.id,
-    }
-    const clinic = await Clinic.findOne(find)
-    
-    
+    };
+    const clinic = await Clinic.findOne(find);
+
     res.render('admin/pages/clinics/detail', {
-      pageTitle: product.title,
+      pageTitle: clinic.tenPhongKham, // [SỬA] Lấy tên phòng khám làm tiêu đề
       clinic: clinic
-    })
+    });
   } catch (error) {
-    res.redirect(`${version}${systemConfig.prefixAdmin}/clinics`)
+    req.flash("error", "Không tìm thấy phòng khám!");
+    res.redirect(`${systemConfig.prefixAdmin}/clinics`);
   }
 }
 
-// [PATCH] /admin/clinics/change-status/:id
+// [PATCH] /admin/clinics/change-status/:status/:id
 module.exports.changeStatus = async (req, res) => {
   try {
     const id = req.params.id;
     const status = req.params.status;
-    await Clinic.updateOne({
-      _id: id
-    },{
-      status: status
+    await Clinic.updateOne({ _id: id }, {
+    status: status,
+   
     })
     req.flash('success', 'Thành công!')
+    const redirectUrl = req.get('Referer')
+    res.redirect(redirectUrl);
     } catch (error) {
       console.log("LỖI KHI CẬP NHẬT TRẠNG THÁI:", error);
       req.flash('error', 'Lỗi! Cập nhật trạng thái thất bại.');
-      res.redirect('back');
+      res.redirect(`${systemConfig.prefixAdmin}/clinics`);
     }
-
+    
 }
 
 // [PATCH] /admin/clinics/change-multi/
@@ -137,6 +138,6 @@ module.exports.changeMulti = async (req, res) => {
       req.flash('error', 'Hành động không hợp lệ!');
       break;
   }
-  const redirectUrl = req.body.redirect || `${pathAdmin}/clinics`;
+  const redirectUrl = req.body.redirect;
   res.redirect(redirectUrl);
 };
