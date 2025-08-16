@@ -1,0 +1,84 @@
+extends ../../layouts/default.pug
+include ../../mixins/alert.pug
+
+block main
+  +alert-error(5000)
+  .container.my-5
+    h2 📝 Nhập thông tin bệnh nhân
+    form(
+      method="POST", 
+      action='/API/v1/kiosk/step-1/info',
+     
+    )
+      .mb-3
+        label.form-label(for="cccd") CCCD
+        input.form-control(type="text", name="cccd", value=cccd, readonly)
+
+
+      .mb-3
+        label.form-label(for="fullName") Họ tên
+        input.form-control(type="text", name="fullName", required)
+
+      .mb-3
+        label.form-label(for="birthday") Ngày sinh
+        input.form-control(type="date", name="birthday", required)
+
+      .mb-3
+        label.form-label(for="gender") Giới tính
+        select.form-select(name="gender" required)
+          option(value="Nam") Nam
+          option(value="Nữ") Nữ
+
+      input(type="hidden", name="provinceName", id="provinceName")
+      input(type="hidden", name="districtName", id="districtName")
+      input(type="hidden", name="wardName", id="wardName")
+      
+      .mb-3
+        label.form-label(for="province") Tỉnh/Thành phố
+        select.form-select(name="province" id="provinceSelect" required)
+          option(value="") -- Chọn tỉnh --
+          each province in provinces || []
+            option(value=province.code)= province.name
+
+
+      .mb-3
+        label.form-label(for="district") Quận/Huyện
+        select.form-select(name="district" id="districtSelect" required disabled)
+          option(value="") -- Chọn quận/huyện --
+
+      .mb-3
+        label.form-label(for="ward") Xã/Phường
+        select.form-select(name="ward" id="wardSelect" required disabled)
+          option(value="") -- Chọn xã/phường --
+
+      .mb-3
+        label.form-label(for="fullAddress") Địa chỉ đầy đủ
+        input.form-control(type="text", id="fullAddress", readonly)
+        
+      .mb-3
+        label.form-label(for="job") Nghề nghiệp
+        select.form-select(name="job")
+          option(value="") -- Chọn nghề nghiệp --
+          option(value="Công nhân") Công nhân
+          option(value="Nông dân") Nông dân
+          option(value="Học sinh") Học sinh
+          option(value="Sinh viên") Sinh viên
+          option(value="Khác") Khác
+
+      .mb-3
+        label.form-label(for="ethnicity") Dân tộc
+        select.form-select(name="ethnicity")
+          option(value="") -- Chọn dân tộc --
+          option(value="Kinh") Kinh
+          option(value="Tày") Tày
+          option(value="Thái") Thái
+          option(value="Mường") Mường
+          option(value="Khác") Khác
+
+      .mb-3
+        label.form-label(for="phone") Số điện thoại
+        input.form-control(type="number", name="phone", required)
+
+      button.btn.btn-success(type="submit") 💾 Lưu thông tin
+block script
+  script(src="/js/province.js")

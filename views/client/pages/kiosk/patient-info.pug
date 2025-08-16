@@ -1,0 +1,33 @@
+
+extends ../../layouts/default.pug
+include ../../mixins/progress-steps.pug
+block main
+  +progressbar(currentStep, 2)
+  .container.my-5
+    h2 🧾 Thông tin bệnh nhân
+    table.table
+      tr
+        th CCCD
+        td= patient.cccd
+      tr
+        th Họ tên
+        td= patient.fullName
+      tr
+        th Ngày sinh
+        td= patient.birthday.toLocaleDateString('vi-VN')
+      tr
+        th Giới tính
+        td= patient.gender
+      tr
+        th Địa chỉ
+        td= `${patient.ward}, ${patient.district}, ${patient.province}`
+      tr
+        th Nghề nghiệp
+        td= patient.job
+      tr
+        th Dân tộc
+        td= patient.ethnicity
+      tr
+        th Số điện thoại
+        td= patient.phone
+    //-a.btn.btn-primary(href=`/API/v1/kiosk/step-1/info?cccd=${patient.cccd}&new=1`) ✏️ Chỉnh sửa

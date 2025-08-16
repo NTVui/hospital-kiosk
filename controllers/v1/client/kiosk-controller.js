@@ -1,6 +1,6 @@
 const BHYT = require("../../../model/bhyt-record-model");
 const Patient = require("../../../model/patient-model");
-
+const axios = require('axios');
 // [GET] /kiosk
 module.exports.index = (req, res) => {
   // Thay vì render layout mặc định, hãy chỉ định layout cho KIOSK
@@ -9,63 +9,209 @@ module.exports.index = (req, res) => {
   });
 };
 
+// [GET] /kiosk/step-1/dang-ky-kham-benh
 module.exports.step1 = (req, res) => {
   res.render("client/pages/kiosk/step-1", {
-    pageTitle: "Bước 1: Thông tin",
-    
+    pageTitle: "Chọn đối tượng khám bệnh",
+    currentStep: 1
   });
 };
-// [POST] /kiosk/step1/check-cccd
-module.exports.checkCccd = async (req, res) => {
-  try {
-    const { cccd } = req.body;
 
-    // 1. Kiểm tra BHYT
-    const bhytRecord = await BHYT.findOne({ cccd: cccd });
-    if (!bhytRecord) {
-      return res.json({
-        success: true, // Request thành công nhưng...
-        hasBhyt: false, // ...không có BHYT
-        message: "CCCD không có đăng ký BHYT hợp lệ."
-      });
+
+// [GET] /kiosk/step-1/check-cccd
+module.exports.step1checkCccd = (req, res) => {
+  res.render("client/pages/kiosk/step-1-cccd", {
+    pageTitle: "Kiểm tra CCCD, BHYT",
+    currentStep: 1
+  });
+};
+//[POST] /kiosk/step-1/check-cccd
+module.exports.step1checkCccdPost = async (req, res) => {
+  try {
+    const { cccd, soBHYT } = req.body;
+
+    if (!/^\d{12}$/.test(cccd)) {
+      req.flash("error", "CCCD phải gồm đúng 12 chữ số");
+      return res.redirect("/API/v1/kiosk/step-1/check-cccd");
     }
 
-    // 2. Nếu có BHYT, kiểm tra xem bệnh nhân đã có trong hệ thống chưa
-    const patient = await Patient.findOne({ cccd: cccd});
-    if (patient) {
-      // Nếu đã có thông tin
-      return res.json({
-        success: true,
-        hasBhyt: true,
-        patientExists: true,
-        patientInfo: patient
-      });
+    let bhytRecord
+    if (soBHYT) {
+      bhytRecord = await BHYT.findOne({ cccd, soBHYT });
     } else {
-      // Nếu chưa có thông tin
-      return res.json({
-        success: true,
-        hasBhyt: true,
-        patientExists: false
-      });
+      bhytRecord = await BHYT.findOne({ cccd });
+    }
+    if (!bhytRecord) {
+      req.flash('error', 'Không tìm thấy thẻ BHYT. Vui lòng chuyển sang khám dịch vụ.');
+      return res.redirect('/API/v1/kiosk/step-1/dang-ky-kham-benh');
+    }
+
+
+    if (!bhytRecord.hospitalCode.startsWith("BV")) {
+      req.flash('error', 'Thẻ BHYT khác tuyến. Vui lòng chuyển sang đăng ký khám dịch vụ.');
+      return res.redirect('/API/v1/kiosk/step-1/dang-ky-kham-benh');
+    }
+
+
+    const patient = await Patient.findOne({ cccd, deleted: false });
+
+    if (patient) {
+      return res.redirect(`/API/v1/kiosk/step-1/info?cccd=${cccd}`);
+    } else {
+      req.flash("error", "Vui lòng nhập thông tin vì chưa có!")
+      return res.redirect(`/API/v1/kiosk/step-1/info?cccd=${cccd}&new=1`);
+
     }
 
   } catch (error) {
-    res.status(500).json({ success: false, message: "Có lỗi xảy ra, vui lòng thử lại." });
+    console.error(error);
+    req.flash('error', ' Lỗi hệ thống. Vui lòng thử lại.');
+    return res.redirect("back");
   }
 };
 
-// Hàm render Step 2
-module.exports.step2 = (req, res) => {
-  res.render("client/pages/kiosk/step-2", {
-    pageTitle: "Bước 2: Chọn dịch vụ",
-    step: 2 // <-- THÊM BIẾN NÀY
-  });
+// [GET] /kiosk/step-1/info
+module.exports.step1Info = async (req, res) => {
+  try {
+    const { cccd, new: isNew } = req.query;
+
+    if (!cccd) {
+      req.flash('error', 'Thiếu CCCD để tra cứu thông tin.');
+      return res.redirect('/API/v1/kiosk/step-1/check-cccd');
+    }
+
+    // Lấy danh sách provinces cho form
+    const response = await axios.get("https://provinces.open-api.vn/api/?depth=1");
+    const provinces = response.data || [];
+
+    if (isNew === "1") {
+      return res.render("client/pages/kiosk/patient-form", {
+        pageTitle: "Nhập thông tin bệnh nhân",
+        currentStep: 2,
+        cccd,
+        provinces
+      });
+    }
+
+    const patient = await Patient.findOne({ cccd, deleted: false });
+
+    if (!patient) {
+      req.flash('error', 'Không tìm thấy thông tin bệnh nhân.');
+      return res.redirect('/API/v1/kiosk/step-1/check-cccd');
+    }
+
+    res.render("client/pages/kiosk/patient-info", {
+      pageTitle: "Thông tin bệnh nhân",
+      currentStep: 2,
+      patient,
+      provinces
+    });
+
+  } catch (error) {
+    console.error(error);
+    req.flash('error', 'Lỗi hệ thống.');
+    return res.redirect('/API/v1/kiosk/step-1/check-cccd');
+  }
 };
 
-// Hàm render Step 3
-module.exports.step3 = (req, res) => {
-  res.render("client/pages/kiosk/step-3", {
-    pageTitle: "Bước 3: Hoàn tất",
-    step: 3 // <-- THÊM BIẾN NÀY
-  });
+
+
+// //[POST] /kiosk/step-1/info
+// module.exports.step1InfoPost = async (req, res) => {
+//   console.log(req.body)
+// };
+
+// [POST] /kiosk/step-1/info
+module.exports.step1InfoPost = async (req, res) => {
+  //console.log(req.body)
+  try {
+    const CccdExist = await Patient.findOne({ 
+    cccd: req.body.cccd,
+    deleted: false });
+  if(CccdExist){
+    req.flash('error', 'CCCD đã tồn tại')
+    const redirectUrl = req.get('Referer')
+    return res.redirect(redirectUrl)
+  }
+  const patient = new Patient({
+      ...req.body,
+      province: req.body.provinceName,
+      district: req.body.districtName,
+      ward: req.body.wardName
+    });
+  await patient.save();
+  req.flash("success", "Thêm mới thành công!");
+  return res.redirect(`/API/v1/kiosk/step-1/info?cccd=${req.body.cccd}`);
+  } catch (error) {
+    console.log(error)
+    req.flash("error", "Lỗi hệ thống khi lưu thông tin bệnh nhân.");
+  }
+  // try {
+  //   const { cccd, fullName, birthday, gender, province, district, ward, job, ethnicity, phone } = req.body;
+
+  //   // Kiểm tra bệnh nhân đã có trong DB chưa
+  //   let patient = await Patient.findOne({ cccd, deleted: false });
+
+  //   if (patient) {
+  //     // 🔄 Nếu có → update thông tin
+  //     patient.fullName = fullName;
+  //     patient.birthday = birthday;
+  //     patient.gender = gender;
+  //     patient.province = province;
+  //     patient.district = district;
+  //     patient.ward = ward;
+  //     patient.job = job;
+  //     patient.ethnicity = ethnicity;
+  //     patient.phone = phone;
+
+  //     await patient.save();
+  //     req.flash("success", "Cập nhật thông tin bệnh nhân thành công!");
+  //   } else {
+  //     // Nếu chưa có → tạo mới
+  //     patient = new Patient({
+  //       cccd,
+  //       fullName,
+  //       birthday,
+  //       gender,
+  //       province,
+  //       district,
+  //       ward,
+  //       job,
+  //       ethnicity,
+  //       phone
+  //     });
+
+  //     await patient.save();
+  //     req.flash("success", "Thêm mới bệnh nhân thành công!");
+  //   }
+
+  //   // Sau khi lưu → chuyển sang trang hiển thị info
+  //   return res.redirect(`/API/v1/kiosk/step-1/info?cccd=${cccd}`);
+
+  // } catch (error) {
+  //   console.error(error);
+  //   req.flash("error", "Lỗi hệ thống khi lưu thông tin bệnh nhân.");
+  //   const redirectUrl = req.get("Referer");
+  //   return res.redirect(redirectUrl);
+  // }
 };
+
+
+// [GET] /kiosk/step-3
+// module.exports.step3 = (req, res) => {
+//   res.render("client/pages/kiosk/step-3", {
+//     pageTitle: "Bước 3: Hoàn tất",
+//     currentStep: 3
+//   });
+// };
+
+
+
+
+// // Hàm render Step 3
+// module.exports.step3 = (req, res) => {
+//   res.render("client/pages/kiosk/step-3", {
+//     pageTitle: "Bước 3: Hoàn tất",
+//     step: 3 
+//   });
+// };

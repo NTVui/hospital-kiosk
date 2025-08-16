@@ -1,0 +1,12 @@
+mixin progressbar(currentStep, totalSteps=4)
+  .progress-container
+    each n in [...Array(totalSteps).keys()].map(i => i+1)
+      if n < currentStep
+        .circle.active ✔
+      else if n == currentStep
+        .circle.active #{n}
+      else
+        .circle #{n}
+    .progress-bar
+      - const percent = ((currentStep - 1) / (totalSteps - 1)) * 100
+      .indicator(style=`width: ${percent}%`)

@@ -11,10 +11,12 @@ html(lang="vi")
   body
     .kiosk-wrapper
       header.kiosk-header
-        .logo
+        a.logo(href="/API/v1/kiosk")
           img(src="https://phuongnamvina.com/img_data/images/logo-benh-vien.jpg", alt="Logo Bệnh viện")
           span BỆNH VIỆN 
       
       main.kiosk-main
         //- Nội dung của từng trang sẽ được chèn vào đây
         block main
+    script(src="/js/scripts.js")
+    block script

@@ -1,0 +1,18 @@
+extends ../../layouts/default.pug
+include ../../mixins/progress-steps.pug
+include ../../mixins/alert.pug
+block main
+  +alert-error(5000)
+  +progressbar(currentStep, 1)
+  .container.my-5
+    h2.text-center 🏥 Kiểm tra thông tin bệnh nhân
+
+    form(method="POST", action="/API/v1/kiosk/step-1/check-cccd")
+      .mb-3
+        label.form-label(for="cccd") Số CCCD
+        input.form-control(type="text", name="cccd", required placeholder="Nhập số CCCD")
+      .mb-3
+        label.form-label(for="soBHYT") Số BHYT
+        input.form-control(type="text", name="soBHYT",placeholder="Nhập số BHYT")
+      button(class="btn btn-secondary", button-go-back) Trở lại
+      button.btn.btn-primary(type="submit") Kiểm tra

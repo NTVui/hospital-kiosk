@@ -1,16 +1,28 @@
 extends ../../layouts/default.pug
-
+include ../../mixins/progress-steps.pug
+include ../../mixins/alert.pug
 block main
-  .kiosk-progress
-    ul.progress-steps
-      li.step.active(data-step="1") Bước 1: Kiểm tra CCCD
-      li.step(data-step="2") Bước 2: Nhập thông tin
-      li.step(data-step="3") Bước 3: Xác nhận
-
-  .kiosk-content
-    h2 Kiểm tra CCCD
-    form#checkCccdForm(method="POST", action="/kiosk/step1/check-cccd")
-      .form-group
-        label(for="cccd") Nhập số CCCD:
-        input#cccd.form-control(type="text", name="cccd", placeholder="Nhập 12 số CCCD")
-      button.btn.btn-primary(type="submit") Kiểm tra
+  +alert-error(5000)
+  .kiosk-menu
+    h1.menu-title HƯỚNG DẪN ĐĂNG KÝ KHÁM CHỮA BỆNH
+    p.menu-subtitle #{pageTitle}
+    +progressbar(currentStep, 1)
+    .button-container
+      
+      a.menu-button.menu-button--teal(href="/API/v1/kiosk/step-1/check-cccd")
+        .menu-button__icon
+          i(class="fas fa-file-medical")
+        .menu-button__text
+          .main-text BHYT
+          .sub-text 
+            p Có thẻ BHYT tại cơ sở khám chữa bệnh 
+            p Có thẻ CCCD 
+      
+     
+      a.menu-button.menu-button--gray(href="/API/v1/kiosk/step-1/")
+        .menu-button__icon
+          i(class="fas fa-user-friends")
+        .menu-button__text
+          .main-text Khám thu phí
+          .sub-text 
+            p Bệnh nhân khám dịch vụ

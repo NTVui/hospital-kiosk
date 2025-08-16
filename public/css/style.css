@@ -97,37 +97,39 @@ body {
   justify-content: center;
 }
 
-/* 🔳 Nút chức năng */
+/* 🔳 Nút chức năng (đã sửa đổi) */
 .menu-button {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center; /* Thêm để căn giữa nội dung theo chiều dọc */
   text-decoration: none;
   color: #fff;
-  width: 280px;
-  height: 200px;
+  width: 300px; /* Tăng chiều rộng một chút */
+  min-height: 220px; /* THAY ĐỔI: Dùng min-height thay vì height */
   border-radius: 16px;
-  padding: 20px;
+  padding: 25px; /* Tăng padding để có nhiều không gian hơn */
   box-shadow: 0 4px 15px rgba(0,0,0,0.1);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .menu-button__icon {
-  font-size: 3rem;
+  font-size: 3.5rem; /* Tăng kích thước icon */
   margin-bottom: 15px;
 }
 
 .menu-button__text .main-text {
-  font-size: 1.3rem;
+  font-size: 1.8rem; /* Tăng kích thước chữ chính */
   font-weight: bold;
   text-align: center;
 }
 
 .menu-button__text .sub-text {
-  font-size: 0.95rem;
+  font-size: 1rem; /* Tăng kích thước chữ phụ */
   text-align: center;
-  margin-top: 5px;
-  opacity: 0.85;
+  margin-top: 10px;
+  opacity: 0.9;
+  line-height: 1.4; /* Cải thiện khoảng cách giữa các dòng */
 }
 
 /* 🎨 Màu sắc từng nút */
@@ -137,6 +139,15 @@ body {
 
 .menu-button--blue {
   background: linear-gradient(135deg, #007bff, #0056b3);
+}
+
+
+.menu-button--teal {
+  background: linear-gradient(135deg, #1abc9c, #16a085);
+}
+
+.menu-button--gray {
+  background: linear-gradient(135deg, #495057, #343a40);
 }
 
 /* 🖱 Hiệu ứng hover */
@@ -153,34 +164,119 @@ body {
   }
 }
 
-/* 🔹 Thanh trạng thái Step */
-.kiosk-progress {
-  margin-bottom: 20px;
+/* 🌟 Vùng thông báo hiển thị (mặc định là hiện) */
+[show-alert] {
+  position: fixed;
+  top: 70px;
+  right: 15px;
+  z-index: 9999;
+  transition: all 0.3s ease;
 }
 
-.progress-steps {
-  list-style: none;
-  padding: 0;
+/* ❌ Khi muốn ẩn thông báo: thêm class .alert-hidden */
+[show-alert].alert-hidden {
+  animation-name: alert-hidden;
+  animation-duration: 0.5s;
+  animation-fill-mode: both;
+}
+
+/* 🎬 Keyframe ẩn thông báo (slide ra ngoài và biến mất) */
+@keyframes alert-hidden {
+  from {
+    right: 15px;
+    opacity: 1;
+  }
+  to {
+    right: -100%;
+    opacity: 0;
+    display: none;
+  }
+}
+
+/* 📦 Nút đóng nằm trong alert */
+[show-alert] [close-alert] {
+  background: #ffffffc4;       /* 💡 nền trắng trong suốt một chút */
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  line-height: 24px;           /* 📐 canh chữ theo chiều cao */
+  text-align: center;
+  font-weight: 600;
+  border-radius: 50%;          /* 🎯 tạo hình tròn */
+  cursor: pointer;             /* 🖱️ hiện hình tay khi hover */
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  font-size: 14px;
+  transition: background 0.3s;
+}
+
+/* 🖌️ Hover có hiệu ứng mượt hơn */
+.show-alert [close-alert]:hover {
+  background: #ffcccc;
+}
+
+/* 🌟 Container chính */
+.progress-container {
   display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  margin: 30px auto;
+}
+
+/* 🌟 Thanh bar nền */
+.progress-bar {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background-color: #e0e0e0;
+  transform: translateY(-50%);
+  z-index: 1;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+/* 🌟 Thanh indicator chạy */
+.progress-bar .indicator {
+  height: 100%;
+  background-color: #007bff; /* xanh Bootstrap */
+  transition: width 0.3s ease;
+}
+
+/* 🌟 Vòng tròn step */
+.circle {
+  position: relative;
+  z-index: 2;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background-color: #fff;
+  border: 3px solid #ccc;
+  display: flex;
+  align-items: center;
   justify-content: center;
-  gap: 20px;
-}
-
-.progress-steps .step {
-  padding: 10px 15px;
-  border-radius: 20px;
-  background: #e0e0e0;
   font-weight: bold;
-  color: #555;
-  transition: background 0.3s, color 0.3s;
+  color: #666;
+  font-size: 16px;
+  transition: all 0.3s ease;
 }
 
-.progress-steps .step.active {
-  background: #007bff;
-  color: white;
+/* 🌟 Step hiện tại */
+.circle.active {
+  border-color: #007bff;
+  background-color: #007bff;
+  color: #fff;
 }
 
-.progress-steps .step.completed {
-  background: #28a745;
-  color: white;
+/* 🌟 Step đã hoàn thành (icon check) */
+.circle.active:contains("✔") {
+  background-color: #28a745; /* xanh lá khi hoàn thành */
+  border-color: #28a745;
+  color: #fff;
 }
+

@@ -3,40 +3,19 @@ const mongoose = require("mongoose");
 const patientSchema = new mongoose.Schema({
   cccd: {
     type: String,
-    required: [true, "Số CCCD là bắt buộc"],
-    unique: true,
+    required: [true, "CCCD là bắt buộc"],
+    match: [/^\d{12}$/, "CCCD phải gồm đúng 12 chữ số"],
     trim: true
   },
-  hoTen: {
-    type: String,
-    required: [true, "Họ tên là bắt buộc"],
-    trim: true
-  },
-  ngaySinh: {
-    type: Date,
-    required: [true, "Ngày sinh là bắt buộc"]
-  },
-  gioiTinh: {
-    type: String,
-    enum: ['Nam', 'Nữ', 'Khác'],
-    required: [true, "Giới tính là bắt buộc"]
-  },
-  soDienThoai: {
-    type: String,
-    trim: true
-  },
-  diaChi: { 
-    type: String,
-    trim: true
-  },
-  ngheNghiep: {
-    type: String,
-    trim: true
-  },
-  danToc: {
-    type: String,
-    trim: true
-  },
+  fullName: String,
+  birthday: Date,
+  gender: String,
+  province: String,
+  district: String,
+  ward: String,
+  job: String,
+  ethnicity: String,
+  phone: String,
   deleted: {
     type: Boolean,
     default: false

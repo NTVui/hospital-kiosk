@@ -1,16 +1,11 @@
 const mongoose = require("mongoose");
 
 const bhytRecordSchema = new mongoose.Schema({
-  cccd: {
-    type: String,
-    required: true,
-    unique: true
-  },
-  soBHYT: {
-    type: String,
-    required: true,
-    unique: true
-  }
+  soBHYT: String,
+  cccd: String,
+  issueDate: Date,
+  expireDate: Date,
+  hospitalCode: String
 }, {
   timestamps: true
 });

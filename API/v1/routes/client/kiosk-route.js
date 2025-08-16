@@ -4,10 +4,9 @@ const controller = require("../../../../controllers/v1/client/kiosk-controller")
 
 // Route cho trang chính
 router.get('/', controller.index);
-router.get('/step-1/check-cccd', controller.step1);
-router.post('/step-1/check-cccd', controller.checkCccd);
-
-// router.get('/step-2', controller.step2);
-// router.get('/step-3', controller.step3);
-
+router.get('/step-1/dang-ky-kham-benh', controller.step1);
+router.get('/step-1/check-cccd', controller.step1checkCccd);
+router.post('/step-1/check-cccd', controller.step1checkCccdPost);
+router.get('/step-1/info', controller.step1Info);
+router.post('/step-1/info', controller.step1InfoPost);
 module.exports = router;
