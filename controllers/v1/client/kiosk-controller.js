@@ -292,14 +292,3 @@ module.exports.step2RegisterPost = async (req, res) => {
 //     currentStep: 3
 //   });
 // };
-
-
-
-
-// // Hàm render Step 3
-// module.exports.step3 = (req, res) => {
-//   res.render("client/pages/kiosk/step-3", {
-//     pageTitle: "Bước 3: Hoàn tất",
-//     step: 3 
-//   });
-// };
