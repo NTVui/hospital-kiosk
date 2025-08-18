@@ -1,0 +1,29 @@
+extends ../../layouts/default.pug
+include ../../mixins/alert.pug
+include ../../mixins/progress-steps.pug
+block main
+  +progressbar(currentStep, 2)
+  .container.my-5
+    h2 🏥 Lựa chọn dịch vụ khám
+
+    // Form gửi POST
+    form(method="POST", action=`/API/v1/kiosk/step-2/register/${cccd}`)
+
+      // Chọn phòng khám
+      .mb-3
+        label.form-label(for="clinicId") Chọn phòng khám
+        select.form-select(name="clinicId", required)
+          option(value="") -- Chọn phòng khám --
+          each clinic in clinics
+            option(value=clinic._id)= clinic.tenPhongKham
+
+      // Chọn dịch vụ
+      .mb-3
+        label.form-label(for="serviceId") Chọn dịch vụ khám
+        select.form-select(name="serviceId", required)
+          option(value="") -- Chọn dịch vụ --
+          each service in services
+            option(value=service._id)= service.tenDichVu + " (" + service.price + "₫)"
+
+      // Nút submit
+      button.btn.btn-primary(type="submit") Đăng ký khám

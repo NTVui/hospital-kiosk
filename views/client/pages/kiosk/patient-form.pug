@@ -1,7 +1,8 @@
 extends ../../layouts/default.pug
 include ../../mixins/alert.pug
-
+include ../../mixins/progress-steps.pug
 block main
+  +progressbar(currentStep, 1)
   +alert-error(5000)
   .container.my-5
     h2 📝 Nhập thông tin bệnh nhân

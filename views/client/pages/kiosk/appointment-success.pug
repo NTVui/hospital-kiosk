@@ -1,0 +1,21 @@
+extends ../../layouts/default.pug
+
+block main
+  .container.my-5.text-center
+    h2 🎉 Đăng ký thành công
+    p Bệnh nhân: #{patient.tenBenhNhan}
+    p Dịch vụ: #{appointment.serviceId}
+    p Phòng khám: #{appointment.clinicId}
+    p Bác sĩ phụ trách: #{appointment.doctorName}
+    h3 Số phiếu của bạn: #{appointment.queueNumber}
+
+    img(src=`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${appointment.qrCode}`)
+
+    // Nút in
+    button(onclick="window.print()") 🖨️ In phiếu
+
+  script.
+    // Auto quay về màn hình chính sau 30s
+    setTimeout(() => {
+      window.location.href = '/API/v1/kiosk';
+    }, 30000);

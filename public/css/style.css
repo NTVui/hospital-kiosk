@@ -240,7 +240,11 @@ body {
   border-radius: 2px;
   overflow: hidden;
 }
-
+.progress-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
 /* 🌟 Thanh indicator chạy */
 .progress-bar .indicator {
   height: 100%;

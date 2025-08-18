@@ -1,5 +1,8 @@
 const BHYT = require("../../../model/bhyt-record-model");
 const Patient = require("../../../model/patient-model");
+const Service = require("../../../model/service-model")
+const Clinic = require("../../../model/clinic-model")
+const Appointment = require("../../../model/appointment-model")
 const axios = require('axios');
 // [GET] /kiosk
 module.exports.index = (req, res) => {
@@ -99,7 +102,9 @@ module.exports.step1Info = async (req, res) => {
       req.flash('error', 'Không tìm thấy thông tin bệnh nhân.');
       return res.redirect('/API/v1/kiosk/step-1/check-cccd');
     }
-
+    if(patient){
+      req.flash("success", "Đã có thông tin bệnh nhân!")
+    }
     res.render("client/pages/kiosk/patient-info", {
       pageTitle: "Thông tin bệnh nhân",
       currentStep: 2,
@@ -195,6 +200,89 @@ module.exports.step1InfoPost = async (req, res) => {
   //   return res.redirect(redirectUrl);
   // }
 };
+
+// [GET] /kiosk/step-2/services/:cccd
+module.exports.step2Register = async (req, res) => {
+  try {
+    const cccd = req.params.cccd
+    const services = await Service.find({ status: "active", deleted: false });
+    const clinics = await Clinic.find({ status: "active", deleted: false });
+    res.render("client/pages/kiosk/register",{
+      pageTitle: "Chọn dịch vụ khám",
+      currentStep: 2,
+      services: services,
+      clinics: clinics,
+      cccd
+    })
+    // res.json({
+    //   success: true,
+    //   services,
+    //   clinics
+    // });
+  } catch (err) {
+    console.error("Error listServices:", err);
+    //res.status(500).json({ success: false, message: "Lỗi server" });
+  }
+};
+
+// [POST] /kiosk/step-2/services/:cccd
+module.exports.step2RegisterPost = async (req, res) => {
+  try {
+    const { cccd } = req.params;
+    const { serviceId, clinicId } = req.body;
+
+    const patient = await Patient.findOne({ cccd });
+    if (!patient) return res.status(404).send("Bệnh nhân không tồn tại");
+
+    // Check nếu bệnh nhân đã có appointment trong ngày
+    const today = new Date();
+    const startOfDay = new Date(today.setHours(0,0,0,0));
+
+    let appointment = await Appointment.findOne({
+      patientId: patient._id,
+      clinicId,
+      serviceId,
+      createdAt: { $gte: startOfDay }
+    });
+
+    // Nếu chưa có thì tạo mới
+    if (!appointment) {
+      const count = await Appointment.countDocuments({
+        clinicId,
+        createdAt: { $gte: startOfDay }
+      });
+      const queueNumber = count + 1;
+
+      const clinic = await Clinic.findById(clinicId);
+      const service = await Service.findById(serviceId);
+
+      const doctorName = clinic?.bacSiPhuTrach || "Đang cập nhật";
+      const qrCode = `APPT-${Date.now()}-${queueNumber}`;
+
+      appointment = new Appointment({
+        patientId: patient._id,
+        serviceId,
+        clinicId,
+        doctorName,
+        queueNumber,
+        qrCode
+      });
+      await appointment.save();
+    }
+
+    // Render ra pug
+    res.render("client/pages/kiosk/appointment-success", {
+      pageTitle: "Đăng ký thành công",
+      appointment,
+      patient
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Lỗi server");
+  }
+};
+
 
 
 // [GET] /kiosk/step-3

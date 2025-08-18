@@ -1,8 +1,11 @@
 
 extends ../../layouts/default.pug
 include ../../mixins/progress-steps.pug
+include ../../mixins/alert.pug
 block main
-  +progressbar(currentStep, 2)
+  +alert-error(5000)
+  +alert-success(5000)
+  +progressbar(currentStep, 1)
   .container.my-5
     h2 🧾 Thông tin bệnh nhân
     table.table
@@ -30,4 +33,5 @@ block main
       tr
         th Số điện thoại
         td= patient.phone
+    a.btn.btn-primary(href=`/API/v1/kiosk/step-2/register/${patient.cccd}`) Dịch vụ khám
     //-a.btn.btn-primary(href=`/API/v1/kiosk/step-1/info?cccd=${patient.cccd}&new=1`) ✏️ Chỉnh sửa

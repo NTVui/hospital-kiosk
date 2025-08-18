@@ -9,4 +9,6 @@ router.get('/step-1/check-cccd', controller.step1checkCccd);
 router.post('/step-1/check-cccd', controller.step1checkCccdPost);
 router.get('/step-1/info', controller.step1Info);
 router.post('/step-1/info', controller.step1InfoPost);
+router.get('/step-2/register/:cccd', controller.step2Register);
+router.post('/step-2/register/:cccd', controller.step2RegisterPost);
 module.exports = router;
