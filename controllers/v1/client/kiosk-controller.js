@@ -2,6 +2,7 @@ const BHYT = require("../../../model/bhyt-record-model");
 const Patient = require("../../../model/patient-model");
 const Service = require("../../../model/service-model")
 const Clinic = require("../../../model/clinic-model")
+const ServiceHelper = require("../../../helpers/service")
 const Appointment = require("../../../model/appointment-model")
 const axios = require('axios');
 // [GET] /kiosk
@@ -20,7 +21,7 @@ module.exports.step1 = (req, res) => {
   });
 };
 
-
+//----- Khám BHYT -------
 // [GET] /kiosk/step-1/check-cccd
 module.exports.step1checkCccd = (req, res) => {
   res.render("client/pages/kiosk/step-1-cccd", {
@@ -31,27 +32,23 @@ module.exports.step1checkCccd = (req, res) => {
 //[POST] /kiosk/step-1/check-cccd
 module.exports.step1checkCccdPost = async (req, res) => {
   try {
-    const { cccd, soBHYT } = req.body;
+    const { cccd } = req.body;
 
     if (!/^\d{12}$/.test(cccd)) {
       req.flash("error", "CCCD phải gồm đúng 12 chữ số");
       return res.redirect("/API/v1/kiosk/step-1/check-cccd");
     }
 
-    let bhytRecord
-    if (soBHYT) {
-      bhytRecord = await BHYT.findOne({ cccd, soBHYT });
-    } else {
-      bhytRecord = await BHYT.findOne({ cccd });
-    }
+    const bhytRecord = await BHYT.findOne({ cccd });
+    
     if (!bhytRecord) {
-      req.flash('error', 'Không tìm thấy thẻ BHYT. Vui lòng chuyển sang khám dịch vụ.');
+      req.flash('error', 'Không tìm thấy thẻ BHYT. Vui lòng chuyển sang khám thu phí.');
       return res.redirect('/API/v1/kiosk/step-1/dang-ky-kham-benh');
     }
 
 
     if (!bhytRecord.hospitalCode.startsWith("BV")) {
-      req.flash('error', 'Thẻ BHYT khác tuyến. Vui lòng chuyển sang đăng ký khám dịch vụ.');
+      req.flash('error', 'Thẻ BHYT khác tuyến. Vui lòng chuyển sang đăng ký khám thu phí.');
       return res.redirect('/API/v1/kiosk/step-1/dang-ky-kham-benh');
     }
 
@@ -97,7 +94,7 @@ module.exports.step1Info = async (req, res) => {
     }
 
     const patient = await Patient.findOne({ cccd, deleted: false });
-
+    const bhytRecord = await BHYT.findOne({ cccd });
     if (!patient) {
       req.flash('error', 'Không tìm thấy thông tin bệnh nhân.');
       return res.redirect('/API/v1/kiosk/step-1/check-cccd');
@@ -109,6 +106,7 @@ module.exports.step1Info = async (req, res) => {
       pageTitle: "Thông tin bệnh nhân",
       currentStep: 2,
       patient,
+      bhytRecord,
       provinces
     });
 
@@ -118,13 +116,6 @@ module.exports.step1Info = async (req, res) => {
     return res.redirect('/API/v1/kiosk/step-1/check-cccd');
   }
 };
-
-
-
-// //[POST] /kiosk/step-1/info
-// module.exports.step1InfoPost = async (req, res) => {
-//   console.log(req.body)
-// };
 
 // [POST] /kiosk/step-1/info
 module.exports.step1InfoPost = async (req, res) => {
@@ -158,7 +149,7 @@ module.exports.step1InfoPost = async (req, res) => {
   //   let patient = await Patient.findOne({ cccd, deleted: false });
 
   //   if (patient) {
-  //     // 🔄 Nếu có → update thông tin
+  //     // Nếu có → update thông tin
   //     patient.fullName = fullName;
   //     patient.birthday = birthday;
   //     patient.gender = gender;
@@ -205,12 +196,13 @@ module.exports.step1InfoPost = async (req, res) => {
 module.exports.step2Register = async (req, res) => {
   try {
     const cccd = req.params.cccd
-    const services = await Service.find({ status: "active", deleted: false });
+    const services = await Service.find({ status: "active", deleted: false }).populate("clinic_id");
+    const newServices = ServiceHelper.pricesBHYT(services);
     const clinics = await Clinic.find({ status: "active", deleted: false });
     res.render("client/pages/kiosk/register",{
       pageTitle: "Chọn dịch vụ khám",
       currentStep: 2,
-      services: services,
+      services: newServices,
       clinics: clinics,
       cccd
     })
@@ -231,6 +223,9 @@ module.exports.step2RegisterPost = async (req, res) => {
     const { cccd } = req.params;
     const { serviceId, clinicId } = req.body;
 
+    const clinic = await Clinic.findById(clinicId);
+      const service = await Service.findById(serviceId);
+
     const patient = await Patient.findOne({ cccd });
     if (!patient) return res.status(404).send("Bệnh nhân không tồn tại");
 
@@ -240,21 +235,20 @@ module.exports.step2RegisterPost = async (req, res) => {
 
     let appointment = await Appointment.findOne({
       patientId: patient._id,
-      clinicId,
-      serviceId,
+      serviceName: service.tenDichVu,
+      clinicName: clinic.tenPhongKham,
       createdAt: { $gte: startOfDay }
     });
 
     // Nếu chưa có thì tạo mới
     if (!appointment) {
       const count = await Appointment.countDocuments({
-        clinicId,
+        clinicName: clinic.tenPhongKham,
         createdAt: { $gte: startOfDay }
       });
       const queueNumber = count + 1;
 
-      const clinic = await Clinic.findById(clinicId);
-      const service = await Service.findById(serviceId);
+      
 
       const doctorName = clinic?.bacSiPhuTrach || "Đang cập nhật";
       const qrCode = `APPT-${Date.now()}-${queueNumber}`;
@@ -263,6 +257,8 @@ module.exports.step2RegisterPost = async (req, res) => {
         patientId: patient._id,
         serviceId,
         clinicId,
+        serviceName: service.tenDichVu,       // ✅ Lưu tên dịch vụ
+        clinicName: clinic.tenPhongKham,
         doctorName,
         queueNumber,
         qrCode
@@ -282,6 +278,146 @@ module.exports.step2RegisterPost = async (req, res) => {
     res.status(500).send("Lỗi server");
   }
 };
+//----- Hết Khám BHYT -------
+
+
+//----- Khám thu phí -------
+// [GET] /kiosk/step-1/check-cccd-self
+module.exports.step1checkCccdSelf = (req, res) => {
+  res.render("client/pages/kiosk/step-1-cccd-self", {
+    pageTitle: "Kiểm tra CCCD - Khám thu phí",
+    currentStep: 1
+  });
+};
+
+// [POST] /kiosk/step-1/check-cccd-self
+module.exports.step1checkCccdPostSelf = async (req, res) => {
+  try {
+    const { cccd } = req.body;
+
+    if (!/^\d{12}$/.test(cccd)) {
+      req.flash("error", "CCCD phải gồm đúng 12 chữ số");
+      return res.redirect("/API/v1/kiosk/step-1/check-cccd-self");
+    }
+
+    const patient = await Patient.findOne({ cccd, deleted: false });
+
+    if (patient) {
+      // Có Patient → sang bước đăng ký dịch vụ
+      return res.redirect(`/API/v1/kiosk/step-2/register-self/${cccd}`);
+    } else {
+      // Chưa có Patient → nhập info mới
+      return res.render("client/pages/kiosk/patient-form-self", {
+        pageTitle: "Nhập thông tin bệnh nhân khám thu phí",
+        currentStep: 2,
+        cccd
+      });
+    }
+  }catch(error){
+    console.error(error);
+    req.flash("error", "Lỗi hệ thống khi kiểm tra CCCD.");
+    return res.redirect("back");
+    }
+  };
+
+// [POST] /kiosk/step-1/info-self
+module.exports.step1InfoPostSelf = async (req, res) => {
+  try {
+
+    let patient = await Patient.findOne({ cccd, deleted: false });
+    if (!patient) {
+      patient = new Patient(req.body);
+      await patient.save();
+    }
+
+    req.flash("success", "Lưu thông tin bệnh nhân thành công!");
+    return res.redirect(`/API/v1/kiosk/step-2/register-self/${cccd}`);
+
+  } catch (error) {
+    console.error(error);
+    req.flash("error", "Lỗi hệ thống khi lưu bệnh nhân.");
+    return res.redirect("back");
+  }
+};
+
+// [GET] /kiosk/step-2/register-self/:cccd
+module.exports.step2RegisterSelf = async (req, res) => {
+  try {
+    const { cccd } = req.params;
+    const services = await Service.find({ status: "active", deleted: false }).populate("clinic_id");
+    const clinics = await Clinic.find({ status: "active", deleted: false });
+
+    res.render("client/pages/kiosk/register-self", {
+      pageTitle: "Chọn dịch vụ khám thu phí",
+      currentStep: 2,
+      services,
+      clinics,
+      cccd
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Lỗi server khi load dịch vụ khám thu phí.");
+  }
+};
+
+// [POST] /kiosk/step-2/register-self/:cccd
+module.exports.step2RegisterSelfPaid = async (req, res) => {
+  try {
+    const { cccd } = req.params;
+    const { serviceId, clinicId } = req.body;
+
+    // 1. Lấy thông tin bệnh nhân
+    let patient = await Patient.findOne({ cccd });
+    if (!patient) {
+      // Nếu chưa có thì tạo mới (vì khám thu phí có thể không cần BHYT)
+      patient = new Patient({ cccd, fullName: "Khách vãng lai" });
+      await patient.save();
+    }
+
+    // 2. Lấy thông tin dịch vụ & phòng khám
+    const clinic = await Clinic.findById(clinicId);
+    const service = await Service.findById(serviceId);
+
+    // 3. Tạo appointment như khám BHYT
+    const today = new Date();
+    const startOfDay = new Date(today.setHours(0, 0, 0, 0));
+
+    const count = await Appointment.countDocuments({
+      clinicName: clinic.tenPhongKham,
+      createdAt: { $gte: startOfDay }
+    });
+    const queueNumber = count + 1;
+
+    const doctorName = clinic?.bacSiPhuTrach || "Đang cập nhật";
+    const qrCode = `APPT-SELF-${Date.now()}-${queueNumber}`;
+
+    const appointment = new Appointment({
+      patientId: patient._id,
+      serviceId: service._id,
+      clinicId: clinic._id,
+      serviceName: service.tenDichVu,
+      clinicName: clinic.tenPhongKham,
+      doctorName,
+      queueNumber,
+      qrCode
+    });
+    await appointment.save();
+
+    res.render("client/pages/kiosk/appointment-success", {
+      pageTitle: "Đăng ký khám thu phí thành công",
+      appointment,
+      patient
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Lỗi server");
+  }
+};
+//----- Hết Khám thu phí -------
+
+
+
 
 
 

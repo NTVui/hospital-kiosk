@@ -284,3 +284,50 @@ body {
   color: #fff;
 }
 
+/*Phần chọn dịch vụ khám*/
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.card {
+  display: block;
+  background: #e8f5e9;
+  padding: 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:nth-child(2n) { background: #c8e6c9; }
+.card:nth-child(3n) { background: #bbdefb; }
+.card:nth-child(4n) { background: #ffe0b2; }
+
+.card-content {
+  pointer-events: none;
+}
+
+/* .checkmark {
+  display: none;
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  font-size: 20px;
+  font-weight: bold;
+  color: #007bff;
+} */
+
+/* Khi radio được chọn: chỉ hiện tick */
+.card input:checked ~ .checkmark {
+  display: block;
+}
+
+.card:hover {
+  transform: scale(1.03);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+
+

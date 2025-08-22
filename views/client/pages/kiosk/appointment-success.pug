@@ -5,8 +5,8 @@ block main
   .container.my-5.text-center
     h2 Đăng ký thành công
     p Bệnh nhân: #{patient.fullName}
-    p Dịch vụ: #{appointment.serviceId}
-    p Phòng khám: #{appointment.clinicId}
+    p Dịch vụ: #{appointment.serviceName}
+    p Phòng khám: #{appointment.clinicName}
     p Bác sĩ phụ trách: #{appointment.doctorName}
     h3 Số phiếu của bạn: #{appointment.queueNumber}
 
@@ -18,7 +18,7 @@ block main
         | In phiếu
 
   script.
-    // Auto quay về màn hình chính sau 30s
+    // Auto quay về màn hình chính sau 2 phút
     setTimeout(() => {
       window.location.href = '/API/v1/kiosk';
-    }, 30000);
+    }, 120000);

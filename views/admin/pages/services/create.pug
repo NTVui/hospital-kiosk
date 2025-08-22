@@ -10,6 +10,7 @@ block main
       form(
         action=`${pathAdmin}/services/create`
         method="POST"
+        enctype="multipart/form-data" 
       )
         .form-group
           label(for="tenDichVu") Tên dịch vụ *
@@ -29,24 +30,32 @@ block main
         .form-group
           label(for="price") Giá tiền
           input#price.form-control(type="number", name="price", min="0")
-        
+        .form-group
+          label(for='discount') % Giảm giá cho BHYT
+          input#discount.form-control(
+            type='number',
+            name='discountPercentage',
+            min='0',
+            value='0',
+            required
+          )
         .form-group
           label(for="description") Mô tả
           textarea#description.form-control(name="description", rows="4")
 
         .form-group(upload-image)
-              label(for="thumbnail") Hình ảnh
-              input#thumbnail.form-control-file(type='file', name='thumbnail', accept="image/*", upload-image-input)
-              img(src="", upload-image-preview, class="image-preview")
-              span(class="btn btn-danger btn-sm d-inline-block mt-2" upload-image-remove) Xóa ảnh
+          label(for="thumbnail") Hình ảnh
+          input#thumbnail.form-control-file(type='file', name='thumbnail', accept="image/*", upload-image-input)
+          img(src="", upload-image-preview, class="image-preview")
+          span(class="btn btn-danger btn-sm d-inline-block mt-2" upload-image-remove) Xóa ảnh
 
         .form-group
           label Trạng thái
           .form-check.form-check-inline
-            input#status-active.form-check-input(type='radio', name='status', value='Hoạt động', checked)
+            input#status-active.form-check-input(type='radio', name='status', value='active', checked)
             label.form-check-label(for='status-active') Hoạt động
           .form-check.form-check-inline
-            input#status-inactive.form-check-input(type='radio', name='status', value='Tạm ngưng')
+            input#status-inactive.form-check-input(type='radio', name='status', value='inactive')
             label.form-check-label(for='status-inactive') Tạm ngưng
 
         .form-group

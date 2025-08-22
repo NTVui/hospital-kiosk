@@ -1,0 +1,37 @@
+extends ../../layouts/default.pug
+include ../../mixins/alert.pug
+include ../../mixins/progress-steps.pug
+block main
+  +progressbar(currentStep, 1)
+  +alert-error(5000)
+  .container.my-5
+    h2 📝 Nhập thông tin bệnh nhân khám thu phí
+    form(
+      method="POST", 
+      action='/API/v1/kiosk/step-1/info',
+     
+    )
+      .mb-3
+        label.form-label(for="cccd") CCCD
+        input.form-control(type="text", name="cccd", value=cccd, readonly)
+
+
+      .mb-3
+        label.form-label(for="fullName") Họ tên
+        input.form-control(type="text", name="fullName", required)
+
+      .mb-3
+        label.form-label(for="birthday") Ngày sinh
+        input.form-control(type="date", name="birthday", required)
+
+      .mb-3
+        label.form-label(for="gender") Giới tính
+        select.form-select(name="gender" required)
+          option(value="Nam") Nam
+          option(value="Nữ") Nữ
+
+      .mb-3
+        label.form-label(for="phone") Số điện thoại
+        input.form-control(type="number", name="phone", required)
+
+      button.btn.btn-success(type="submit") 💾 Lưu thông tin

@@ -12,6 +12,10 @@ block main
       tr
         th CCCD
         td= patient.cccd
+      if bhytRecord.soBHYT 
+        tr
+          th BHYT
+          td= bhytRecord.soBHYT 
       tr
         th Họ tên
         td= patient.fullName

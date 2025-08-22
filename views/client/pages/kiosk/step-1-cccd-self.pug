@@ -7,7 +7,7 @@ block main
   .container.my-5
     h2.text-center 🏥 Kiểm tra thông tin bệnh nhân
 
-    form(method="POST", action="/API/v1/kiosk/step-1/check-cccd")
+    form(method="POST", action="/API/v1/kiosk/step-1/check-cccd-self")
       .mb-3
         label.form-label(for="cccd") Số CCCD
         input.form-control(type="text", name="cccd", required placeholder="Nhập số CCCD")

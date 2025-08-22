@@ -5,14 +5,15 @@ mongoose.plugin(slug);
 const serviceSchema = new mongoose.Schema({
     tenDichVu: String,
     clinic_id: {
-        type: String,
-        default: "",
-        ref: 'Clinic'
-    },
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Clinic",
+        required: true
+        },
     price: Number,
     status: String,
     position: Number,
     description: String,
+    discountPercentage: Number,
     thumbnail: String,
     createdBy:{
         account_id: String,

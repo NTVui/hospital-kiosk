@@ -151,12 +151,12 @@ module.exports.create = async (req, res) => {
     // Lấy tất cả các phòng khám đang hoạt động
     const clinics = await Clinic.find({
       deleted: false,
-      status: "Hoạt động"
+      status: "active"
     }).select("id tenPhongKham"); // Chỉ lấy id và tên để tối ưu
 
     res.render('admin/pages/services/create', {
       pageTitle: 'Thêm mới Dịch vụ',
-      clinics: clinics // <-- Truyền danh sách phòng khám vào Pug
+      clinics: clinics 
     });
 
   } catch (error) {
@@ -167,8 +167,9 @@ module.exports.create = async (req, res) => {
 
 // [POST] /admin/services/create
 module.exports.createPost = async (req, res) => {
+  req.body.price = parseInt(req.body.price)
+  req.body.discountPercentage = parseInt(req.body.discountPercentage)
   try {
-    // Logic xử lý position của bạn đã đúng
     if (req.body.position && req.body.position.trim() !== "") {
       req.body.position = parseInt(req.body.position);
     } else {
@@ -177,7 +178,7 @@ module.exports.createPost = async (req, res) => {
     }
     
     
-    console.log(req.body); // Bạn có thể log ra để kiểm tra
+    //console.log(req.body);
 
     const newService = new Service(req.body);
     await newService.save();

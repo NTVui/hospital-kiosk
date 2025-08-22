@@ -7,7 +7,7 @@ block main
   .container.my-5
     h2 🏥 Lựa chọn dịch vụ khám
 
-    form(method="POST", action=`/API/v1/kiosk/step-2/register/${cccd}`)
+    form(method="POST", action=`/API/v1/kiosk/step-2/register-self/${cccd}`)
       input(type="hidden", name="clinicId", id="clinicId")
       .grid
         each service in services
@@ -22,7 +22,7 @@ block main
               )
               .card-content
                 h4.card-title= `PK ${service.clinic_id.tenPhongKham} - ${service.tenDichVu}`
-                p.card-subtitle= `Giá áp dụng BHYT: ${service.priceNew} VNĐ (đã giảm ${service.discountPercentage}%)`
+                p.card-subtitle= `Giá: ${service.price} VNĐ`
               
 
       button.btn.btn-primary(type="submit") Đăng ký khám

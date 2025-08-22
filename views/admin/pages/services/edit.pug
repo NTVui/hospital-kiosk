@@ -38,7 +38,16 @@ block main
                 label(for="price") Giá tiền
                 //- Điền giá tiền cũ
                 input#price.form-control(type="number", name="price", min="0", value=service.price)
-            
+            .form-group
+              label(for='discount') % Giảm giá
+              input#discount.form-control(
+                type='number',
+                name='discountPercentage',
+                min='0',
+                max='100',
+                value=service.discountPercentage,
+                required
+              )
             .form-group
                 label(for="description") Mô tả
                 //- Điền mô tả cũ vào textarea

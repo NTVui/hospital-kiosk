@@ -16,6 +16,8 @@ const appointmentSchema = new mongoose.Schema({
     ref: "Clinic",
     required: true
   },
+  serviceName: { type: String, required: true },  
+  clinicName: { type: String, required: true },    
   doctorName: {
     type: String,
     default: "Đang cập nhật"

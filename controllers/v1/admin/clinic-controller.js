@@ -133,7 +133,7 @@ module.exports.changeMulti = async (req, res) => {
       break;
 
     case "delete-all":
-      await Clinic.deleteMany({ _id: { $in: ids } }, { deleted: true });
+      await Clinic.deleteMany({ _id: { $in: ids } });
       req.flash("success", `Đã xóa hết!`);
       break;
     default:
@@ -151,7 +151,7 @@ module.exports.deleteItem = async (req, res) => {
   //await Clinic.deleteOne({ _id: id }) Xóa hẳn
   //Xóa mềm: xóa trên nhưng trên database vẫn hiện nhưng thay đổi
   //deleted: true
-  await Clinic.updateOne(
+  await Clinic.deleteOne(
     { _id: id },
     {
       deleted: true,
@@ -177,7 +177,7 @@ module.exports.create = (req, res) => {
 // [POST] /admin/clinics/create
 module.exports.createPost = async (req, res) => {
   try {
-    // Sửa lại logic xử lý position
+    
     if (req.body.position && req.body.position.trim() !== "") {
       req.body.position = parseInt(req.body.position);
     } else {
@@ -185,6 +185,7 @@ module.exports.createPost = async (req, res) => {
       const count = await Clinic.countDocuments({ deleted: false });
       req.body.position = count + 1;
     }
+    //console.log(req.body)
 
     const newClinic = new Clinic(req.body);
     await newClinic.save();
