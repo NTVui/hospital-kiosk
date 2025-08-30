@@ -5,6 +5,9 @@ const database = require("./config/database");
 const methodOverride = require('method-override')
 const bodyParser = require('body-parser')
 
+const http = require('http');
+const { Server } = require("socket.io");
+
 const flash = require('express-flash')
 const cookieParser = require('cookie-parser')
 const session = require('express-session')
@@ -35,6 +38,11 @@ app.use(bodyParser.json())
 app.use(cookieParser('key tu Vui'))
 app.use(session({ cookie: { maxAge: 60000 } }))
 app.use(flash())
+
+//SocketIo
+const server = http.createServer(app);
+const io = new Server(server);
+global._io = io
 
 route(app);
 routeAdmin(app);

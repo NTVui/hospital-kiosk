@@ -4,6 +4,7 @@ const Service = require("../../../model/service-model")
 const Clinic = require("../../../model/clinic-model")
 const ServiceHelper = require("../../../helpers/service")
 const Appointment = require("../../../model/appointment-model")
+const Payment = require("../../../model/payment-model");
 const axios = require('axios');
 // [GET] /kiosk
 module.exports.index = (req, res) => {
@@ -307,6 +308,7 @@ module.exports.step1checkCccdPostSelf = async (req, res) => {
       return res.redirect(`/API/v1/kiosk/step-2/register-self/${cccd}`);
     } else {
       // Chưa có Patient → nhập info mới
+      req.flash("error", "Vui lòng nhập thông tin vì chưa có!");
       return res.render("client/pages/kiosk/patient-form-self", {
         pageTitle: "Nhập thông tin bệnh nhân khám thu phí",
         currentStep: 2,
@@ -323,7 +325,7 @@ module.exports.step1checkCccdPostSelf = async (req, res) => {
 // [POST] /kiosk/step-1/info-self
 module.exports.step1InfoPostSelf = async (req, res) => {
   try {
-
+    const { cccd } = req.body
     let patient = await Patient.findOne({ cccd, deleted: false });
     if (!patient) {
       patient = new Patient(req.body);
@@ -374,39 +376,73 @@ module.exports.step2RegisterSelfPaid = async (req, res) => {
       await patient.save();
     }
 
-    // 2. Lấy thông tin dịch vụ & phòng khám
-    const clinic = await Clinic.findById(clinicId);
+    // // 2. Lấy thông tin dịch vụ & phòng khám
+    // const clinic = await Clinic.findById(clinicId);
+    // const service = await Service.findById(serviceId);
+
+    // // 3. Tạo appointment như khám BHYT
+    // const today = new Date();
+    // const startOfDay = new Date(today.setHours(0, 0, 0, 0));
+
+    // const count = await Appointment.countDocuments({
+    //   clinicName: clinic.tenPhongKham,
+    //   createdAt: { $gte: startOfDay }
+    // });
+    // const queueNumber = count + 1;
+
+    // const doctorName = clinic?.bacSiPhuTrach || "Đang cập nhật";
+    // const qrCode = `APPT-SELF-${Date.now()}-${queueNumber}`;
+
+    // const appointment = new Appointment({
+    //   patientId: patient._id,
+    //   serviceId: service._id,
+    //   clinicId: clinic._id,
+    //   serviceName: service.tenDichVu,
+    //   clinicName: clinic.tenPhongKham,
+    //   doctorName,
+    //   queueNumber,
+    //   qrCode
+    // });
+    // await appointment.save();
+
+    // res.render("client/pages/kiosk/appointment-success", {
+    //   pageTitle: "Đăng ký khám thu phí thành công",
+    //   appointment,
+    //   patient
+    // });
+
+    res.redirect(`/API/v1/kiosk/step-3/payment/${patient._id}?clinicId=${clinicId}&serviceId=${serviceId}`);
+
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Lỗi server");
+  }
+};
+
+// [GET] /kiosk/step-3/payment/:patientId
+module.exports.step3PaymentGet = async (req, res) => {
+  try {
+    const { patientId } = req.params;
+    const { serviceId, clinicId } = req.query; // ✅ lấy từ query
+
+    const patient = await Patient.findById(patientId);
+    if (!patient) return res.status(404).send("Không tìm thấy bệnh nhân");
+
+    // ✅ Lấy đúng 1 service & clinic theo id
     const service = await Service.findById(serviceId);
+    const clinic = await Clinic.findById(clinicId);
 
-    // 3. Tạo appointment như khám BHYT
-    const today = new Date();
-    const startOfDay = new Date(today.setHours(0, 0, 0, 0));
+    if (!service || !clinic) {
+      return res.status(400).send("Thiếu thông tin dịch vụ hoặc phòng khám");
+    }
 
-    const count = await Appointment.countDocuments({
-      clinicName: clinic.tenPhongKham,
-      createdAt: { $gte: startOfDay }
-    });
-    const queueNumber = count + 1;
-
-    const doctorName = clinic?.bacSiPhuTrach || "Đang cập nhật";
-    const qrCode = `APPT-SELF-${Date.now()}-${queueNumber}`;
-
-    const appointment = new Appointment({
-      patientId: patient._id,
-      serviceId: service._id,
-      clinicId: clinic._id,
-      serviceName: service.tenDichVu,
-      clinicName: clinic.tenPhongKham,
-      doctorName,
-      queueNumber,
-      qrCode
-    });
-    await appointment.save();
-
-    res.render("client/pages/kiosk/appointment-success", {
-      pageTitle: "Đăng ký khám thu phí thành công",
-      appointment,
-      patient
+    res.render("client/pages/kiosk/payment", {
+      pageTitle: "Thanh toán dịch vụ",
+      currentStep: 3,
+      patient,
+      service,
+      clinic
     });
 
   } catch (err) {
@@ -414,6 +450,97 @@ module.exports.step2RegisterSelfPaid = async (req, res) => {
     res.status(500).send("Lỗi server");
   }
 };
+
+
+// [POST] /kiosk/step-3/payment/:patientId
+module.exports.step3PaymentPost = async (req, res) => {
+  try {
+    const { patientId } = req.params;
+    const { method, clinicId, serviceId } = req.body;
+
+    console.log(req.body)
+    const patient = await Patient.findById(patientId);
+    if (!patient) return res.status(404).send("Không tìm thấy bệnh nhân");
+
+    const clinic = await Clinic.findById(clinicId);
+    const service = await Service.findById(serviceId);
+
+    if (!clinic || !service) {
+      req.flash("error", "Thiếu thông tin dịch vụ hoặc phòng khám");
+      const returnUrl = `/API/v1/kiosk/step-3/payment/${patientId}?clinicId=${clinicId}&serviceId=${serviceId}`;
+      return res.redirect(returnUrl); 
+    }
+
+    // Nếu thanh toán bằng TIỀN MẶT → tạo appointment luôn
+    if (method === "cash") {
+      const appointment = await createAppointment(patient, clinic, service);
+      return res.render("client/pages/kiosk/appointment-success", {
+        pageTitle: "Thanh toán tiền mặt thành công",
+        appointment,
+        patient
+      });
+    }
+
+    // Nếu thanh toán bằng QR
+    if (method === "vnpay") {
+      const uniqueTransactionId = `PAY-${Date.now()}`;
+      // ✅ Tạo 1 Payment record chờ confirm
+    const payment = new Payment({
+      patientId,
+      serviceId,
+      clinicId,
+      method: "qr",
+      amount: service.price, // TODO: lấy từ service
+      status: "pending",
+      transactionId: uniqueTransactionId
+    });
+    await payment.save();
+
+    const vietqrUrl = `https://img.vietqr.io/image/MB-113366668888-compact.jpg?amount=${payment.amount}&addInfo=${encodeURIComponent("Thanh toán DV " + service.tenDichVu)}`;
+    // Render trang hiển thị QR code
+    return res.redirect(`/API/v1/kiosk/payment-qr/${payment._id}`);
+    }
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Lỗi server khi xử lý thanh toán");
+  }
+};
+
+// THÊM HÀM MỚI NÀY VÀO CUỐI FILE CONTROLLER
+
+// [GET] /kiosk/payment-qr/:paymentId
+module.exports.step3PaymentQrGet = async (req, res) => {
+  try {
+    const { paymentId } = req.params;
+    const payment = await Payment.findById(paymentId)
+                                 .populate('patientId')
+                                 .populate('serviceId');
+    
+    if (!payment) {
+      return res.status(404).send("Không tìm thấy thông tin thanh toán");
+    }
+
+    // Dùng lại thông tin từ payment để tạo link QR và render
+    const service = payment.serviceId;
+    const patient = payment.patientId;
+    const vietqrUrl = `https://img.vietqr.io/image/MB-113366668888-compact.jpg?amount=${payment.amount}&addInfo=${encodeURIComponent("Thanh toan DV " + service.tenDichVu)}`;
+
+    res.render("client/pages/kiosk/payment-qr", {
+      pageTitle: "Quét QR để thanh toán",
+      paymentId: payment._id,
+      qrUrl: vietqrUrl,
+      amount: payment.amount,
+      patient,
+      service
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Lỗi server khi hiển thị trang QR");
+  }
+};
+
 //----- Hết Khám thu phí -------
 
 

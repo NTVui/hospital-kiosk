@@ -20,6 +20,11 @@ router.post('/step-1/check-cccd-self', controller.step1checkCccdPostSelf);
 router.post('/step-1/info-self', controller.step1InfoPostSelf);
 router.get('/step-2/register-self/:cccd', controller.step2RegisterSelf);
 router.post('/step-2/register-self/:cccd', controller.step2RegisterSelfPaid);
+router.get("/step-3/payment/:patientId", controller.step3PaymentGet);
+router.post("/step-3/payment/:patientId", controller.step3PaymentPost);
+router.get("/payment-qr/:paymentId", controller.step3PaymentQrGet);
 
+// Step 4: Hoàn tất
+//router.get("/step-4/success/:patientId", kioskController.successGet);
 
 module.exports = router;

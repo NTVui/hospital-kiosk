@@ -1,0 +1,35 @@
+extends ../../layouts/default.pug
+include ../../mixins/alert.pug
+include ../../mixins/progress-steps.pug
+
+block main
+  +progressbar(currentStep, 3)
+  .container.my-5
+    h2 💳 Thanh toán dịch vụ
+
+    form(method="POST", action=`/API/v1/kiosk/step-3/payment/${patient._id}`)
+        input(type="hidden", name="clinicId", value=clinic._id)
+        input(type="hidden", name="serviceId", value=service._id)
+        h3.mt-4.mb-3 💰 Chọn phương thức thanh toán
+            .grid.grid-cols-3.gap-3
+                label.card
+                    input(type="radio", name="method", value="cash")
+                    .card-content
+                        h4.card-title 💵 Tiền mặt
+                label.card
+                    input(type="radio", name="method", value="vnpay")
+                    .card-content
+                        h4.card-title 💳 VNPAY
+
+        button.btn.btn-primary.mt-4(type="submit") Xác nhận thanh toán
+
+  script.
+    form.addEventListener("submit", function(e) {
+        const selected = document.querySelector("input[name='serviceId']:checked");
+        if (selected) {
+            hiddenClinicId.value = selected.dataset.clinicId;
+        } else {
+            e.preventDefault();
+            alert("Vui lòng chọn dịch vụ");
+        }
+    });

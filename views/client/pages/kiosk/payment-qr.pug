@@ -1,0 +1,17 @@
+extends ../../layouts/default.pug
+include ../../mixins/progress-steps.pug
+
+block main
+  +progressbar(currentStep, 3)
+  h2 Thanh toán bằng QR
+  p Vui lòng quét mã QR bên dưới để thanh toán:
+  img(src=qrUrl, alt="QR Code", width="200")
+  p Số tiền: #{amount} VND
+
+  // ⚡ status div
+  div#status.mt-4.text-blue-600.font-bold(
+    data-payment-id=paymentId
+    data-patient-id=patient._id
+  ) Đang chờ thanh toán...
+  // ⚡ file JS riêng
+  script(src="/socket/main.js")
